@@ -1,0 +1,3681 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Module 1 - First steps in R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="" />
+    <script src="libs/header-attrs-2.29/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+class: middle, inverse
+
+
+
+# Module 1 - First steps with R and RStudio
+
+.section-subtitle[
+- R and RStudio
+- Interacting with R
+- Data types and data.frames
+- R packages
+- Data import
+]
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: middle
+
+
+
+# Introduction to R and RStudio
+
+---
+
+# Overview of R
+
+&lt;style type="text/css"&gt;
+.r-console-img {
+margin: 0;
+position: absolute;
+top: 60%;
+right: 0;
+-ms-transform: translate(-25%, -50%);
+transform: translate(-25%, -50%);
+}
+&lt;/style&gt;
+
+.pull-left[
+
+
+- Versatile statistical computing software + language used for
+
+ - data analysis 
+ - visualization 
+ - statistical modeling
+ - data engineering
+ - web applications
+
+- Many users from many fields
+
+ - Biostatistics
+ - Bioinformatics
+ - Environmental Science
+ - Social Sciences
+ - Economics and Finance
+ - Healthcare and Epidemiology
+ - and more ...
+ 
+- R is open-source and community driven
+
+]
+
+.pull-right[
+
+&lt;div class="figure"&gt;
+&lt;img src="images/r-terminal-screenshot.png" alt="The R console" width="100%" /&gt;
+&lt;p class="caption"&gt;The R console&lt;/p&gt;
+&lt;/div&gt;
+
+]
+
+
+---
+
+
+
+# Interacting with R
+
+The basic interaction mode in R is one of **expression evaluation** using a **command line interface (CLI)**.
+
+- The user types an expression (code) into the **R console (CLI)**
+- The system evaluates it
+- The system returns the result
+
+--
+
+Example
+
+
+``` r
+10 + 0.5 * 2 + 1.2 * 3
+```
+
+--
+
+
+```
+#&gt; [1] 14.6
+```
+
+--
+
+
+``` r
+plot(sin(1:10), type = 'l')
+```
+
+--
+
+![](01-Module-1-R-basics-and-data-import_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+
+---
+
+# R is built, and extended, with **packages**
+
+Bundles of code, data, documentation that do specific things and are loaded into R
+
+.footnote[
+[1] What you first install without adding any other packages
+]
+
+- The **base**&lt;sup&gt;1&lt;/sup&gt; version of R contains many useful 'built-in' packages  
+
+--
+
+- We often install additional packages to **extend the functionality of R**
+
+
+--
+
+.center.large[
+External packages make R very popular and diverse in functionality
+]
+
+
+&lt;img src="images/to-infinity-and-beyond.jpeg" width="400px" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Challenges for the new user
+
+
+&lt;style type="text/css"&gt;
+.challenges-computer-guy {
+position: absolute;
+bottom: 5%;
+right: 2%;
+width: 400px;
+}
+&lt;/style&gt;
+
+.challenges-computer-guy[
+![](images/computer-guy-meme.png)&lt;!-- --&gt;
+]
+
+- Writing **code** instead of using a Graphical User Interface (GUI)
+
+
+``` r
+lm(response ~ predictor_1 + predictor_2, data = model_data)
+```
+
+--
+
+- Interacting with the **computer file system** and with the **command line interface (CLI)**
+
+
+``` r
+import.file("C:/Users/Your_name/Documents/R-course/student-material/file.csv")
+```
+
+--
+
+- **Using the keyboard more** - less mouse clicking, keyboard shortcuts
+&lt;/br&gt;
+&lt;/br&gt;
+
+--
+
+- **Data literacy** - datasets for computers and tidy data
+&lt;/br&gt;
+&lt;/br&gt;
+
+--
+
+- Navigating **R packages**
+&lt;/br&gt;
+&lt;/br&gt;
+
+--
+
+- **Project management** - scripts, data, outputs
+&lt;/br&gt;
+&lt;/br&gt;
+
+--
+
+- Adopting **reproducible research** strategies 
+&lt;/br&gt;
+&lt;/br&gt;
+
+---
+
+# RStudio
+
+.pull-left[
+
+- RStudio is an **Integrated Development Environment (IDE)**. 
+
+  - It **faciliates** the use of R. 
+
+- It makes coding in R **more efficient and productive**
+  - R scripts
+  - syntax (code) highlighting
+  - code completion
+
+- Provides **project management** allowing users to organise projects
+
+- And other, more **advanced** R tools
+
+]
+
+.pull-right[
+
+&lt;div class="figure"&gt;
+&lt;img src="images/rstudio-screenshot.png" alt="RStudio" width="100%" /&gt;
+&lt;p class="caption"&gt;RStudio&lt;/p&gt;
+&lt;/div&gt;
+
+]
+
+---
+
+class: middle, center
+background-image: url(images/rstudio-screenshot-unlabelled.png)
+background-size: contain
+
+---
+
+class: middle, center
+background-image: url(images/rstudio-screenshot-labelled.png)
+background-size: contain
+
+---
+
+# Where does coding happen?
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="images/rstudio-in-action.gif" alt="Code to console" width="90%" /&gt;
+&lt;p class="caption"&gt;Code to console&lt;/p&gt;
+&lt;/div&gt;
+
+---
+
+# Code organisation in "R scripts"
+
+We keep our code files called **"R scripts"** (.R files) ... these are simply **text files**
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="images/an-r-script.png" alt="An R script" width="100%" /&gt;
+&lt;p class="caption"&gt;An R script&lt;/p&gt;
+&lt;/div&gt;
+
+---
+
+#  Code organisation in "R scripts"- writing comments
+
+We use **`#` (hash)** to create comments in our scripts, and they are not interpreted as code
+
+
+``` r
+# Title: A script to do a particular task
+# Date created: Today
+# Details: These are the details of my work
+# Last modified: Tomorrow
+
+my_data &lt;- read.csv('a-data-file.csv')
+
+# This is will be used in future calculations
+days_in_6_months &lt;- 365 / 12 * 6 
+
+
+# Can also be at the end of the line ..
+
+days_in_6_months &lt;- 365 / 12 * 6  # This is will be used in future calculations
+```
+
+.footnote[
+ Rstudio and other IDEs will **colour text** based on it's purpose
+]
+
+---
+
+# Project organisation
+
+.pull-left[
+&lt;img src="images/rstudio-project-layout.png" width="85%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+In a  **main folder - the project folder**, keep together
+
+- scripts
+- data
+- outputs
+
+]
+
+---
+
+# Project organisation
+
+.pull-left[
+&lt;img src="images/rstudio-project-layout.png" width="85%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+In a  **main folder - the project folder**, keep together
+
+- scripts
+- data
+- outputs
+
+
+Use an **RStudio project file (.Rproj)**
+
+- to start RStudio within the project directory
+- allow RStudio to switch between different project easily
+
+
+]
+
+---
+
+# Project organisation
+
+.pull-left[
+&lt;img src="images/rstudio-project-layout.png" width="85%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+In a  **main folder - the project folder**, keep together
+
+- scripts
+- data
+- outputs
+
+
+Use an **RStudio project file (.Rproj)**
+
+- to start RStudio within the project directory
+- allow RStudio to switch between different project easily
+
+For collaboration / version control **share the project folder**
+
+- ensures work is reproducible
+- git/GitHub
+
+]
+
+---
+
+# Project organisation -  RStudio projects
+
+An `.Rproj` file will open RStudio with the "working directory" the project folder
+
+  - avoid file path problems, files/output relative to the project folder
+
+
+.pull-left[
+&lt;img src="images/rstudio-project-file.png" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right[
+&lt;img src="images/rstudio-project-screenshot.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Start / convert projects into a RStudio project
+
+Use RStudio to **create a project file** for a new, or existing, project directories ...  
+
+&lt;br/&gt;
+
+E.g. `File &gt; New Project &gt; follow the prompts shown`
+
+&lt;img src="images/rstudio-create-project.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# R sessions and reproducible code
+
+When we start R and RStudio, we are provided with a **temporary workspace - an R session** where 
+objects and data reside
+
+.pull-left[
+
+- data and objects created **only exist for this session** 
+
+- they are lost when the session ends
+
+]
+
+.pull-right[
+
+&lt;style type="text/css"&gt;
+.r-session-img {
+position: absolute;
+bottom: 5%;
+right: 2%;
+width: 400px;
+}
+&lt;/style&gt;
+
+&lt;img src="images/restart-workspace-2.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+
+--
+
+Your goal is to create **well-structured**, **self-contained code** to **ensure reproducibility**
+
+.pull-left[
+
+- Use **R scripts** to create workflows
+
+- They work from start to finish in an new R session
+
+]
+
+.pull-right[
+&lt;img src="images/rscript-reproducible.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+
+
+---
+
+class: middle
+
+# Before we do our first exercise ...
+
+---
+
+# How we will do excerises - **student-material** folder
+
+In the course folder is a file `r-for-scientific-research.Rproj` and the folder `student-material/`.
+The student material folder contains a series of scripts e.g. `M01-01-xxx` which are the exercises we will work through throughout the course
+
+--
+
+.pull-left-60[
+
+- Open RStudio using `r-for-scientific-research.Rproj`
+
+- With the course project open  
+
+  - Use the **RStudio files browser** to open files in `student-material/`
+  
+- Questions have placeholders for responses
+
+
+``` r
+# Store the result into an object called `evens`
+_ &lt;- c(2,4,6,8,10)
+```
+
+
+``` r
+# Store the result into an object called `evens`
+evens &lt;- c(2,4,6,8,10)
+```
+
+- We 'clear the workspace' for each new script
+  - Ctrl / Cmd + shift + F10
+  - Noted at the top of each exercise to remind you
+
+]
+
+.pull-right-40[
+&lt;img src="images/rstudio-exercises.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Tips and tricks to optimise your interaction with R
+
+&lt;/br&gt;
+
+- **Use a mouse** - much easier to navigate, select and highlight text compared with a trackpad
+
+&lt;/br&gt;
+
+- **Use keyboard shortcuts** - limit clicking
+
+  - Operating system  
+  
+      - cut and paste - `ctrl/cmd + c`, `ctrl/cmd + v`
+      - text selection - `shift + home/end`
+    
+  - RStudio system  
+  
+      - run line of code - `ctrl/cmd + enter`
+      - use the `Tab` button for code and file path completion
+
+&lt;/br&gt;
+
+- **Know how important symbols are accessed on the keyboard**
+  - `$`, `(`, `)`, `[`, `]`, `{`, `}`, `#`, `_`,  `~` `&lt;` `&gt;` `=` `!` `,` `-`, etc ..
+
+---
+
+class: middle, center, inverse
+
+# Let's get started with R and RStudio!
+
+.section-subtitle[
+
+Within RStudio, open the file
+
+.inverse[`M01-01-using-RStudio.R`]
+
+and attempt the exercises
+
+]
+
+---
+
+# Section recap
+
+- Examined the layout and use of RStudio,
+- Where R lives (the console)
+- Entered code into the R console, from a script and from parts of code
+- Stored values and retrieved values in objects, observed them in the environment
+- Observed outputs (print and plot)
+- R sessions
+- The working directory
+- Used the file browser
+- Observed some help documentation
+- File and Tools menu of RStudio for new item and RStudio configuration
+
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: middle
+
+# First steps in R
+
+---
+
+# R is a calculator
+
+We type expressions, R evaluates&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[
+[1] `Ctrl/Cmd + Enter` sends code from script editor to the R console in RStudio
+]
+--
+
+
+``` r
+1 + 1
+```
+
+```
+#&gt; [1] 2
+```
+&lt;/br&gt;
+
+--
+
+
+``` r
+4 * 2
+```
+
+```
+#&gt; [1] 8
+```
+&lt;/br&gt;
+
+--
+
+
+``` r
+# Has math functions
+sin(pi / 4)
+```
+
+```
+#&gt; [1] 0.7071068
+```
+&lt;/br&gt;
+
+---
+
+# Storing values and results
+
+We **assign** values into **objects** using `&lt;-` &lt;sup&gt;1&lt;/sup&gt; (or `=`)
+
+
+``` r
+result1 &lt;- 1 + 1       # recommended to use &lt;-
+result2 = sin(pi / 4)
+```
+
+.footnote[
+
+[1] **Keyboard shortcut**: `Alt` + `-`  
+
+]
+
+--
+
+ Note: generally **nothing** happens if we correctly store the result!
+
+--
+
+
+&lt;/br&gt;
+
+To access the value, we use the object name
+
+
+``` r
+result1
+```
+
+```
+#&gt; [1] 2
+```
+
+--
+
+
+``` r
+result2 
+```
+
+```
+#&gt; [1] 0.7071068
+```
+
+
+
+---
+
+# Naming objects
+
+The are **rules**: must be built from **letters**, **numbers**, **underscore** and **period**, but **cannot start** with numbers.  
+
+
+``` r
+x &lt;- 1
+x_1 &lt;- 1  
+x.1 &lt;- 1
+1x  &lt;- 1  # error
+```
+
+.output-red[
+
+```
+#&gt; Error: unexpected symbol in '1x'
+```
+]
+
+--
+
+Use **consistent, meaningful, descriptive** object names
+
+
+``` r
+# Storing the value of the number of days in 6 months
+m6 &lt;- 365 / 12 * 6 
+days_in_6_months &lt;- 365 / 12 * 6 
+```
+
+--
+
+There is terminology to the style you can use
+
+
+``` r
+i_use_snake_case                     # snake_case
+otherPeopleUseCamelCase              # camelCase
+some.people.use.periods              # periods
+And_aFew.People_RENOUNCEconvention   # ???
+```
+
+--
+
+Do not be afraid of long names! RStudio has `&lt;tab&gt;` completion, which helps you type quickly &amp; correctly!
+
+---
+
+# Object names are case-sensitive
+
+
+
+``` r
+days_in_6_months &lt;- 365 / 12 * 6 
+```
+
+&lt;br&gt;
+
+--
+
+Must match the name exactly ...
+
+.output-red[
+
+``` r
+Days_in_6_months
+```
+
+```
+#&gt; Error: object 'Days_in_6_months' not found
+```
+]
+
+&lt;/br&gt;
+
+--
+
+Like this ..
+
+
+``` r
+days_in_6_months
+```
+
+```
+#&gt; [1] 182.5
+```
+
+--
+
+.footnote[
+Again, using the `&lt;tab&gt;` key in RStudio will help you type and be correct
+]
+
+---
+
+# Doing calculations on sets of numbers - vectors 
+
+.footnote[
+You will use `c()` a lot with R ... remember it!
+]
+
+The function `c()` combines values in a **vector**
+
+
+``` r
+weights_kg &lt;- c(61, 72, 52, 90, 93, 71)
+weights_kg
+```
+
+```
+#&gt; [1] 61 72 52 90 93 71
+```
+&lt;/br&gt;
+--
+
+
+after which we can use in calculations
+
+
+``` r
+# convert values to grams
+weights_g &lt;- weights_kg * 1000
+weights_g
+```
+
+```
+#&gt; [1] 61000 72000 52000 90000 93000 71000
+```
+
+
+
+---
+
+# Functions help us do calculations
+
+Many things in R are done using **functions** ... e.g. statistical functions
+
+
+``` r
+weights_mean &lt;- mean(weights_kg)
+weights_mean
+```
+
+```
+#&gt; [1] 73.16667
+```
+
+--
+
+
+``` r
+weights_mean &lt;- sum(weights_kg) / length(weights_kg)
+weights_mean
+```
+
+```
+#&gt; [1] 73.16667
+```
+
+&lt;/br&gt;
+
+--
+
+**How do they work?** What is this doing?
+
+
+``` r
+seq(0, 10, 2)
+```
+
+```
+#&gt; [1]  0  2  4  6  8 10
+```
+
+---
+
+# Functions have **arguments**, and arguments are given **values** 
+
+
+``` r
+function_name(argument1 = value1, argument2 = value2, ...)
+```
+&lt;br&gt;
+
+--
+
+The `seq()` function
+
+```
+# Help documentation
+
+Generate regular sequences ...
+
+seq(from, to, by, length.out, along.with, ...)
+
+```
+
+&lt;/br&gt;
+
+--
+
+Generate a sequence **from=** 0 **to=** 10 **by=** 2
+
+
+``` r
+seq(0, 10, 2)
+```
+
+```
+#&gt; [1]  0  2  4  6  8 10
+```
+
+---
+
+# Using functions and arguments 
+
+- Arguments can be named, and **this is a good practice** .. code is **readable**
+
+
+``` r
+seq(from = 0, to = 10, by = 2)
+```
+
+```
+#&gt; [1]  0  2  4  6  8 10
+```
+&lt;br&gt;
+--
+
+- Unnamed arguments need be in order ("positional") of the function definition
+  - without names the code is **often ambiguous** ... **use named arguments!**
+  - a *majority of R code from others looks like this* **:o(**
+
+
+``` r
+seq(0, 10, 2)
+```
+
+```
+#&gt; [1]  0  2  4  6  8 10
+```
+&lt;br&gt;
+--
+
+- Named arguments can be in any order
+
+
+``` r
+seq(by = 2, to = 10, from = 0)
+```
+
+```
+#&gt; [1]  0  2  4  6  8 10
+```
+
+---
+
+# Some functions have **default values** for arguments
+
+Why does this work if we only use `to`?
+
+
+``` r
+seq(to = 4)
+```
+
+```
+#&gt; [1] 1 2 3 4
+```
+&lt;br&gt;
+
+--
+
+The help documentation reveals these **default values**
+
+```
+# Help documentation
+
+seq(from = 1, to = 1, by = ((to - from)/(length.out - 1)), ...)
+```
+&lt;br&gt;
+
+--
+
+.pull-left[
+
+Thus 
+
+
+``` r
+seq(to = 4) 
+```
+]
+
+--
+
+.pull-right[
+
+is actually 
+
+
+``` r
+seq(from = 1, to = 4, by = 1)
+```
+]
+
+---
+
+# What arguments and information are available for a function?
+
+Executing the function with `?` before it opens **help documentation**
+
+
+``` r
+?seq
+```
+
+--
+
+.pull-left[
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="images/help-documentation.png" alt="RStudio help viewer panel" width="100%" /&gt;
+&lt;p class="caption"&gt;RStudio help viewer panel&lt;/p&gt;
+&lt;/div&gt;
+]
+
+--
+
+.pull-right[
+
+- R help documentation is standardised
+
+  - Title
+  - Description
+  - Usage
+  - Arguments
+  - Further details
+  - Examples
+
+]
+
+---
+
+# What arguments and information are available for a function?
+
+Do not be afraid to ask Google!
+
+&lt;img src="images/google-help.png" width="700px" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Functions live in packages&lt;sup&gt;1&lt;/sup&gt;
+
+**Packages** are bundles of code, data, documentation that do specific things
+
+- Example of functions in the base R `stats` package
+
+
+``` r
+ ls("package:stats")
+```
+
+.scrollable-slide-300[
+
+```
+#&gt;   [1] "acf"                  "acf2AR"               "add.scope"           
+#&gt;   [4] "add1"                 "addmargins"           "aggregate"           
+#&gt;   [7] "aggregate.data.frame" "aggregate.ts"         "AIC"                 
+#&gt;  [10] "alias"                "anova"                "ansari.test"         
+#&gt;  [13] "aov"                  "approx"               "approxfun"           
+#&gt;  [16] "ar"                   "ar.burg"              "ar.mle"              
+#&gt;  [19] "ar.ols"               "ar.yw"                "arima"               
+#&gt;  [22] "arima.sim"            "arima0"               "arima0.diag"         
+#&gt;  [25] "ARMAacf"              "ARMAtoMA"             "as.dendrogram"       
+#&gt;  [28] "as.dist"              "as.formula"           "as.hclust"           
+#&gt;  [31] "as.stepfun"           "as.ts"                "asOneSidedFormula"   
+#&gt;  [34] "ave"                  "bandwidth.kernel"     "bartlett.test"       
+#&gt;  [37] "BIC"                  "binom.test"           "binomial"            
+#&gt;  [40] "biplot"               "Box.test"             "bw.bcv"              
+#&gt;  [43] "bw.nrd"               "bw.nrd0"              "bw.SJ"               
+#&gt;  [46] "bw.ucv"               "C"                    "cancor"              
+#&gt;  [49] "case.names"           "ccf"                  "chisq.test"          
+#&gt;  [52] "cmdscale"             "coef"                 "coefficients"        
+#&gt;  [55] "complete.cases"       "confint"              "confint.default"     
+#&gt;  [58] "confint.lm"           "constrOptim"          "contr.helmert"       
+#&gt;  [61] "contr.poly"           "contr.SAS"            "contr.sum"           
+#&gt;  [64] "contr.treatment"      "contrasts"            "contrasts&lt;-"         
+#&gt;  [67] "convolve"             "cooks.distance"       "cophenetic"          
+#&gt;  [70] "cor"                  "cor.test"             "cov"                 
+#&gt;  [73] "cov.wt"               "cov2cor"              "covratio"            
+#&gt;  [76] "cpgram"               "cutree"               "cycle"               
+#&gt;  [79] "D"                    "dbeta"                "dbinom"              
+#&gt;  [82] "dcauchy"              "dchisq"               "decompose"           
+#&gt;  [85] "delete.response"      "deltat"               "dendrapply"          
+#&gt;  [88] "density"              "density.default"      "deriv"               
+#&gt;  [91] "deriv3"               "deviance"             "dexp"                
+#&gt;  [94] "df"                   "df.kernel"            "df.residual"         
+#&gt;  [97] "DF2formula"           "dfbeta"               "dfbetas"             
+#&gt; [100] "dffits"               "dgamma"               "dgeom"               
+#&gt; [103] "dhyper"               "diffinv"              "dist"                
+#&gt; [106] "dlnorm"               "dlogis"               "dmultinom"           
+#&gt; [109] "dnbinom"              "dnorm"                "dpois"               
+#&gt; [112] "drop.scope"           "drop.terms"           "drop1"               
+#&gt; [115] "dsignrank"            "dt"                   "dummy.coef"          
+#&gt; [118] "dummy.coef.lm"        "dunif"                "dweibull"            
+#&gt; [121] "dwilcox"              "ecdf"                 "eff.aovlist"         
+#&gt; [124] "effects"              "embed"                "end"                 
+#&gt; [127] "estVar"               "expand.model.frame"   "extractAIC"          
+#&gt; [130] "factanal"             "factor.scope"         "family"              
+#&gt; [133] "fft"                  "filter"               "fisher.test"         
+#&gt; [136] "fitted"               "fitted.values"        "fivenum"             
+#&gt; [139] "fligner.test"         "formula"              "frequency"           
+#&gt; [142] "friedman.test"        "ftable"               "Gamma"               
+#&gt; [145] "gaussian"             "get_all_vars"         "getCall"             
+#&gt; [148] "getInitial"           "glm"                  "glm.control"         
+#&gt; [151] "glm.fit"              "hasTsp"               "hat"                 
+#&gt; [154] "hatvalues"            "hclust"               "heatmap"             
+#&gt; [157] "HoltWinters"          "influence"            "influence.measures"  
+#&gt; [160] "integrate"            "interaction.plot"     "inverse.gaussian"    
+#&gt; [163] "IQR"                  "is.empty.model"       "is.leaf"             
+#&gt; [166] "is.mts"               "is.stepfun"           "is.ts"               
+#&gt; [169] "is.tskernel"          "isoreg"               "KalmanForecast"      
+#&gt; [172] "KalmanLike"           "KalmanRun"            "KalmanSmooth"        
+#&gt; [175] "kernapply"            "kernel"               "kmeans"              
+#&gt; [178] "knots"                "kruskal.test"         "ks.test"             
+#&gt; [181] "ksmooth"              "lag"                  "lag.plot"            
+#&gt; [184] "line"                 "lm"                   "lm.fit"              
+#&gt; [187] "lm.influence"         "lm.wfit"              "loadings"            
+#&gt; [190] "loess"                "loess.control"        "loess.smooth"        
+#&gt; [193] "logLik"               "loglin"               "lowess"              
+#&gt; [196] "ls.diag"              "ls.print"             "lsfit"               
+#&gt; [199] "mad"                  "mahalanobis"          "make.link"           
+#&gt; [202] "makeARIMA"            "makepredictcall"      "manova"              
+#&gt; [205] "mantelhaen.test"      "mauchly.test"         "mcnemar.test"        
+#&gt; [208] "median"               "median.default"       "medpolish"           
+#&gt; [211] "model.extract"        "model.frame"          "model.frame.default" 
+#&gt; [214] "model.matrix"         "model.matrix.default" "model.matrix.lm"     
+#&gt; [217] "model.offset"         "model.response"       "model.tables"        
+#&gt; [220] "model.weights"        "monthplot"            "mood.test"           
+#&gt; [223] "mvfft"                "na.action"            "na.contiguous"       
+#&gt; [226] "na.exclude"           "na.fail"              "na.omit"             
+#&gt; [229] "na.pass"              "napredict"            "naprint"             
+#&gt; [232] "naresid"              "nextn"                "nlm"                 
+#&gt; [235] "nlminb"               "nls"                  "nls.control"         
+#&gt; [238] "NLSstAsymptotic"      "NLSstClosestX"        "NLSstLfAsymptote"    
+#&gt; [241] "NLSstRtAsymptote"     "nobs"                 "numericDeriv"        
+#&gt; [244] "offset"               "oneway.test"          "optim"               
+#&gt; [247] "optimHess"            "optimise"             "optimize"            
+#&gt; [250] "order.dendrogram"     "p.adjust"             "p.adjust.methods"    
+#&gt; [253] "pacf"                 "Pair"                 "pairwise.prop.test"  
+#&gt; [256] "pairwise.t.test"      "pairwise.table"       "pairwise.wilcox.test"
+#&gt; [259] "pbeta"                "pbinom"               "pbirthday"           
+#&gt; [262] "pcauchy"              "pchisq"               "pexp"                
+#&gt; [265] "pf"                   "pgamma"               "pgeom"               
+#&gt; [268] "phyper"               "plclust"              "plnorm"              
+#&gt; [271] "plogis"               "plot.ecdf"            "plot.spec.coherency" 
+#&gt; [274] "plot.spec.phase"      "plot.stepfun"         "plot.ts"             
+#&gt; [277] "pnbinom"              "pnorm"                "poisson"             
+#&gt; [280] "poisson.test"         "poly"                 "polym"               
+#&gt; [283] "power"                "power.anova.test"     "power.prop.test"     
+#&gt; [286] "power.t.test"         "PP.test"              "ppoints"             
+#&gt; [289] "ppois"                "ppr"                  "prcomp"              
+#&gt; [292] "predict"              "predict.glm"          "predict.lm"          
+#&gt; [295] "preplot"              "princomp"             "printCoefmat"        
+#&gt; [298] "profile"              "proj"                 "promax"              
+#&gt; [301] "prop.test"            "prop.trend.test"      "psignrank"           
+#&gt; [304] "psmirnov"             "pt"                   "ptukey"              
+#&gt; [307] "punif"                "pweibull"             "pwilcox"             
+#&gt; [310] "qbeta"                "qbinom"               "qbirthday"           
+#&gt; [313] "qcauchy"              "qchisq"               "qexp"                
+#&gt; [316] "qf"                   "qgamma"               "qgeom"               
+#&gt; [319] "qhyper"               "qlnorm"               "qlogis"              
+#&gt; [322] "qnbinom"              "qnorm"                "qpois"               
+#&gt; [325] "qqline"               "qqnorm"               "qqplot"              
+#&gt; [328] "qr.influence"         "qsignrank"            "qsmirnov"            
+#&gt; [331] "qt"                   "qtukey"               "quade.test"          
+#&gt; [334] "quantile"             "quasi"                "quasibinomial"       
+#&gt; [337] "quasipoisson"         "qunif"                "qweibull"            
+#&gt; [340] "qwilcox"              "r2dtable"             "rbeta"               
+#&gt; [343] "rbinom"               "rcauchy"              "rchisq"              
+#&gt; [346] "read.ftable"          "rect.hclust"          "reformulate"         
+#&gt; [349] "relevel"              "reorder"              "replications"        
+#&gt; [352] "reshape"              "resid"                "residuals"           
+#&gt; [355] "residuals.glm"        "residuals.lm"         "rexp"                
+#&gt; [358] "rf"                   "rgamma"               "rgeom"               
+#&gt; [361] "rhyper"               "rlnorm"               "rlogis"              
+#&gt; [364] "rmultinom"            "rnbinom"              "rnorm"               
+#&gt; [367] "rpois"                "rsignrank"            "rsmirnov"            
+#&gt; [370] "rstandard"            "rstudent"             "rt"                  
+#&gt; [373] "runif"                "runmed"               "rweibull"            
+#&gt; [376] "rwilcox"              "rWishart"             "scatter.smooth"      
+#&gt; [379] "screeplot"            "sd"                   "se.contrast"         
+#&gt; [382] "selfStart"            "setNames"             "shapiro.test"        
+#&gt; [385] "sigma"                "simulate"             "smooth"              
+#&gt; [388] "smooth.spline"        "smoothEnds"           "sortedXyData"        
+#&gt; [391] "spec.ar"              "spec.pgram"           "spec.taper"          
+#&gt; [394] "spectrum"             "spline"               "splinefun"           
+#&gt; [397] "splinefunH"           "SSasymp"              "SSasympOff"          
+#&gt; [400] "SSasympOrig"          "SSbiexp"              "SSD"                 
+#&gt; [403] "SSfol"                "SSfpl"                "SSgompertz"          
+#&gt; [406] "SSlogis"              "SSmicmen"             "SSweibull"           
+#&gt; [409] "start"                "stat.anova"           "step"                
+#&gt; [412] "stepfun"              "stl"                  "StructTS"            
+#&gt; [415] "summary.aov"          "summary.glm"          "summary.lm"          
+#&gt; [418] "summary.manova"       "summary.stepfun"      "supsmu"              
+#&gt; [421] "symnum"               "t.test"               "termplot"            
+#&gt; [424] "terms"                "terms.formula"        "time"                
+#&gt; [427] "toeplitz"             "toeplitz2"            "ts"                  
+#&gt; [430] "ts.intersect"         "ts.plot"              "ts.union"            
+#&gt; [433] "tsdiag"               "tsp"                  "tsp&lt;-"               
+#&gt; [436] "tsSmooth"             "TukeyHSD"             "uniroot"             
+#&gt; [439] "update"               "update.default"       "update.formula"      
+#&gt; [442] "var"                  "var.test"             "variable.names"      
+#&gt; [445] "varimax"              "vcov"                 "weighted.mean"       
+#&gt; [448] "weighted.residuals"   "weights"              "wilcox.test"         
+#&gt; [451] "window"               "window&lt;-"             "write.ftable"        
+#&gt; [454] "xtabs"
+```
+]
+
+.footnote[
+[1] You can make functions outside of packages too
+]
+
+---
+
+# Errors and warnings in R
+
+When **something fails**, you will receive a message in .red[red] ... Be *calm*, and **read the message** ...
+
+--
+
+An **error** means something has failed, and **no result produced**
+
+- An error by the user e.g. **incorrect code**
+- An error from the computer e.g. **computer has used all memory**
+
+
+
+.output-red[
+
+``` r
+seq(from = NA, to = 5, by = 2)
+```
+
+```
+#&gt; Error in seq.default(from = NA, to = 5, by = 2): 'from' must be a finite number
+```
+]
+
+&lt;br&gt;
+
+--
+
+A **warning** means something is not correct, but a **result still produced**.
+
+- Sometimes this is just useful information 
+- Other times you will need to address the warning
+
+.output-red[.code-3-black[
+
+``` r
+seq(from = 0, TO = 6, by = 2)
+```
+
+```
+#&gt; Warning: In seq.default(from = 0, TO = 6, by = 2) :
+#&gt;  extra argument 'TO' will be disregarded
+```
+
+```
+#&gt; [1] 0
+```
+]
+]
+
+---
+
+class: center, middle, inverse
+
+# Let's do some exercises!
+
+.section-subtitle[
+
+Within RStudio, open the file
+
+.inverse[`M01-02-coding-basics.R`]
+
+and attempt the exercises.
+
+
+]
+
+---
+
+# Section recap
+
+- Did math calculations
+- Did calculation with sets of numbers in objects
+- Stored results in well-named objects
+- Played with some fun functions and their arguments
+- Examined help files
+- Observed error and warning messages
+- Use &lt;tab&gt; completion
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: middle
+
+
+
+# Data types, vectors and data.frames
+
+---
+
+# The data.frame
+
+
+&lt;style type="text/css"&gt;
+.dataframe-important {
+position: absolute;
+top: 2%;
+right: 2%;
+width: 180px;
+}
+&lt;/style&gt;
+
+.dataframe-important[
+![](images/important.jpg)&lt;!-- --&gt;
+]
+
+We typically use a data structure for data analysis called a **data.frame**.
+
+A data.frame is a **rectangular collection of different data vectors of the same length** ... a "spreadsheet of data"
+
+- **columns** are data vectors ... variables
+- **rows** are related values across columns ... cases, observations
+
+
+
+.pull-left-60[
+
+``` r
+example_dataframe
+```
+
+```
+#&gt;   ID entry_date age    sex weight test_complete
+#&gt; 1 P1 2024-01-02  30   Male   66.2         FALSE
+#&gt; 2 P2 2024-01-02  41 Female   89.9          TRUE
+#&gt; 3 P3 2024-01-01  48 Female   37.4          TRUE
+#&gt; 4 P4 2024-01-02  42 Female   76.8          TRUE
+#&gt; 5 P5 2024-01-02  24   Male   60.3         FALSE
+#&gt; 6 P6 2024-01-01  49 Female   65.1         FALSE
+#&gt; 7 P7 2024-01-01  50   Male   74.9          TRUE
+#&gt; 8 P8 2024-01-03  28   Male   64.1          TRUE
+```
+]
+
+--
+
+.pull-right-40[
+The column data types
+
+```
+#&gt;               type       
+#&gt; ID            "character"
+#&gt; entry_date    "Date"     
+#&gt; age           "integer"  
+#&gt; sex           "character"
+#&gt; weight        "numeric"  
+#&gt; test_complete "logical"
+```
+]
+
+&lt;br&gt;
+--
+
+
+We must understand **data types and vectors** in R before continuing ...
+
+
+---
+
+# Data types
+
+R has: **numbers**, **text** , **logical** (TRUE/FALSE) and **dates/times**
+
+.pull-left[
+**What you see**
+
+``` r
+5
+```
+
+```
+#&gt; [1] 5
+```
+]
+
+.pull-right[
+**What it is to R**
+
+```
+#&gt; [1] "numeric" "double"  "integer"
+```
+]
+
+--
+
+.pull-left[
+
+``` r
+"Tom"  # or 'Tom' .. " or '
+```
+
+```
+#&gt; [1] "Tom"
+```
+]
+
+.pull-right[
+
+```
+#&gt; [1] "character"
+```
+]
+
+--
+
+.pull-left[
+
+``` r
+TRUE # or FALSE
+```
+
+```
+#&gt; [1] TRUE
+```
+]
+
+.pull-right[
+
+```
+#&gt; [1] "logical"
+```
+]
+
+--
+
+.pull-left[
+
+``` r
+Sys.Date()
+```
+
+```
+#&gt; [1] "2025-05-19"
+```
+]
+
+.pull-right[
+
+```
+#&gt; [1] "Date"   "double"
+```
+]
+
+
+---
+
+
+# Data types - missing values
+
+R uses `NA` for a missing value ("Not Available) and `NaN` for "Not a Number"
+
+.pull-left[
+
+``` r
+NA
+```
+
+```
+#&gt; [1] NA
+```
+]
+
+.pull-right[
+
+``` r
+NaN
+```
+
+```
+#&gt; [1] NaN
+```
+]
+
+--
+
+.pull-left[]
+
+.pull-right[
+
+``` r
+0 / 0
+```
+
+```
+#&gt; [1] NaN
+```
+]
+
+
+.pull-right[
+&lt;br&gt;
+]
+
+&lt;br&gt;
+--
+
+These can have **special** treatment in functions ... we must be mindful of them always!
+
+.pull-left[
+
+``` r
+mean(c(1,2,NA,3))
+```
+
+```
+#&gt; [1] NA
+```
+]
+--
+.pull-right[
+
+``` r
+mean(c(1,2,NA,3), na.rm = T)
+```
+
+```
+#&gt; [1] 2
+```
+]
+
+
+
+---
+
+# Data live in vectors
+
+We store and work with data in **vectors** ... and later have them as **columns** in data frames
+
+
+
+``` r
+# The function `c()` combines values in a vector
+a_number_vector &lt;- c(5, 7, 2, 5, 6, 4)
+
+a_number_vector
+```
+
+```
+#&gt; [1] 5 7 2 5 6 4
+```
+
+--
+
+
+``` r
+a_text_vector &lt;- c("Low", "Mid", "High", "Low", "Mid", 'High')
+
+a_text_vector
+```
+
+```
+#&gt; [1] "Low"  "Mid"  "High" "Low"  "Mid"  "High"
+```
+&lt;/br&gt;
+--
+
+Example  using two vectors together
+
+mean `a_number_vector` values by groups in `a_text_vector`
+ 
+
+``` r
+tapply(X = a_number_vector, INDEX = a_text_vector, FUN = mean)
+```
+
+```
+#&gt; High  Low  Mid 
+#&gt;  3.0  5.0  6.5
+```
+
+
+---
+
+# Only **one** data type can live in a vector
+
+R automatically changes type ("coercion") when different ones exist in a vector
+
+- **Important** when we import "messy" data .. leads to unexpected data types
+
+.pull-left[
+
+``` r
+# now all TEXT
+c(1, 'Tom', TRUE) 
+```
+
+```
+#&gt; [1] "1"    "Tom"  "TRUE"
+```
+]
+--
+.pull-right[
+
+``` r
+# now all NUMBERS
+c(1, 2, TRUE, FALSE)
+```
+
+```
+#&gt; [1] 1 2 1 0
+```
+]
+--
+.pull-left[
+
+``` r
+# now all NUMBERS
+c(1, Sys.Date())
+```
+
+```
+#&gt; [1]     1 20227
+```
+]
+--
+.pull-right[
+
+
+``` r
+# now all TEXT
+c('Tom', Sys.Date())
+```
+
+```
+#&gt; [1] "Tom"   "20227"
+```
+]
+--
+.pull-left[
+
+``` r
+# NA stays NA
+c(1, NA, 2, '3') 
+```
+
+```
+#&gt; [1] "1" NA  "2" "3"
+```
+]
+
+---
+
+# Values can have an identifier - a name
+
+Vector values can have **names**
+
+  - Some function will take named vectors for input e.g. for applying colours to groups in a plot
+
+
+``` r
+named_vector &lt;- c(Low = 1, Mid = 2, High = 3)
+named_vector
+```
+
+```
+#&gt;  Low  Mid High 
+#&gt;    1    2    3
+```
+
+---
+
+# Factor type / vectors - categorising values into groups
+
+**Factors** are special vectors for categorising data values, and used extensively in statistical and plot routines
+
+- Contain **levels** - information about what groups/categories are present
+
+
+``` r
+treatment_factor &lt;- factor(c("Low", "Mid", "High", "Low", "Mid", "High"))
+
+treatment_factor
+```
+
+```
+#&gt; [1] Low  Mid  High Low  Mid  High
+#&gt; Levels: High Low Mid
+```
+&lt;br&gt;
+
+.footnote[
+We will explore these later in the plotting and statistics modules
+]
+
+--
+
+**Numbers to factors**
+- The values now represent the groups "1", "3" and "5" and **not** the numbers ... "factor levels"
+
+
+``` r
+numbers_factor &lt;- factor(c(1, 3, 5, 1, 3, 5))
+
+numbers_factor
+```
+
+```
+#&gt; [1] 1 3 5 1 3 5
+#&gt; Levels: 1 3 5
+```
+
+---
+
+# Vectors can live in different **data structures**
+
+**A vector**
+
+
+```
+#&gt; [1] 1 2 3 4 5 6 7 8 9
+```
+
+.pull-left[
+
+**Matrices**
+
+
+```
+#&gt;      [,1] [,2] [,3]
+#&gt; [1,]    1    4    7
+#&gt; [2,]    2    5    8
+#&gt; [3,]    3    6    9
+```
+
+**Data frames**
+
+
+```
+#&gt;   a_vector    text logical
+#&gt; 1        2   Jerry   FALSE
+#&gt; 2       10   Jerry   FALSE
+#&gt; 3        6   Jerry   FALSE
+#&gt; 4        1     Tom   FALSE
+#&gt; 5        9 Quacker   FALSE
+#&gt; 6        3     Tom    TRUE
+#&gt; 7        4     Tom    TRUE
+#&gt; 8        8     Tom   FALSE
+```
+
+
+]
+
+.pull-right[
+
+**Lists** 
+
+
+```
+#&gt; $a_vector
+#&gt; [1]  6 10  5  3  8  4  1  9
+#&gt; 
+#&gt; $group
+#&gt; [1] "person_list"
+#&gt; 
+#&gt; $n_persons
+#&gt; [1] 3
+#&gt; 
+#&gt; $persons
+#&gt;     names ages
+#&gt; 1     Tom   21
+#&gt; 2   Jerry   25
+#&gt; 3 Quacker   29
+```
+]
+
+--
+
+**We will focus on data frames**
+
+---
+
+# Visualisation of vectors in different data structures
+
+&lt;img src="images/r-data-structures.png" width="95%" /&gt;
+
+---
+
+# data.frames are collections of vectors
+
+We should always check the structure and vectors of a data.frame before using one with `str()`
+
+
+``` r
+example_dataframe
+```
+
+```
+#&gt;   ID entry_date age    sex weight test_complete
+#&gt; 1 P1 2024-01-02  30   Male   66.2         FALSE
+#&gt; 2 P2 2024-01-02  41 Female   89.9          TRUE
+#&gt; 3 P3 2024-01-01  48 Female   37.4          TRUE
+#&gt; 4 P4 2024-01-02  42 Female   76.8          TRUE
+#&gt; 5 P5 2024-01-02  24   Male   60.3         FALSE
+#&gt; 6 P6 2024-01-01  49 Female   65.1         FALSE
+#&gt; 7 P7 2024-01-01  50   Male   74.9          TRUE
+#&gt; 8 P8 2024-01-03  28   Male   64.1          TRUE
+```
+
+--
+
+
+``` r
+str(example_dataframe)
+```
+
+```
+#&gt; 'data.frame':	8 obs. of  6 variables:
+#&gt;  $ ID           : chr  "P1" "P2" "P3" "P4" ...
+#&gt;  $ entry_date   : Date, format: "2024-01-02" "2024-01-02" ...
+#&gt;  $ age          : int  30 41 48 42 24 49 50 28
+#&gt;  $ sex          : chr  "Male" "Female" "Female" "Female" ...
+#&gt;  $ weight       : num  66.2 89.9 37.4 76.8 60.3 65.1 74.9 64.1
+#&gt;  $ test_complete: logi  FALSE TRUE TRUE TRUE FALSE FALSE ...
+```
+
+---
+
+# Importing data typically results in a data.frame
+
+
+
+
+``` r
+penguins &lt;- read.csv(file = 'data/penguins.csv')
+```
+
+--
+
+
+``` r
+class(penguins)
+```
+
+```
+#&gt; [1] "data.frame"
+```
+
+--
+
+
+``` r
+# View the first 6 rows
+head(penguins)
+```
+
+```
+#&gt;   species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g    sex year
+#&gt; 1  Adelie Torgersen           39.1          18.7               181        3750   male 2007
+#&gt; 2  Adelie Torgersen           39.5          17.4               186        3800 female 2007
+#&gt; 3  Adelie Torgersen           40.3          18.0               195        3250 female 2007
+#&gt; 4  Adelie Torgersen             NA            NA                NA          NA   &lt;NA&gt; 2007
+#&gt; 5  Adelie Torgersen           36.7          19.3               193        3450 female 2007
+#&gt; 6  Adelie Torgersen           39.3          20.6               190        3650   male 2007
+```
+
+---
+
+class: middle
+
+# Using columns within data.frames 
+
+---
+
+# Accessing column data
+
+.footnote[
+`$` for interactive analysis ... `[[]]` for programming and in functions
+]
+
+.pull-left-40[
+
+We use
+
+- `$` ... the dollar sign
+- `[[]]` ... double square brackets
+
+which returns a vector of data
+
+]
+
+--
+
+.pull-right-60[
+
+
+``` r
+example_dataframe
+```
+
+```
+#&gt;   ID entry_date age    sex weight test_complete
+#&gt; 1 P1 2024-01-02  30   Male   66.2         FALSE
+#&gt; 2 P2 2024-01-02  41 Female   89.9          TRUE
+#&gt; 3 P3 2024-01-01  48 Female   37.4          TRUE
+#&gt; 4 P4 2024-01-02  42 Female   76.8          TRUE
+#&gt; 5 P5 2024-01-02  24   Male   60.3         FALSE
+#&gt; 6 P6 2024-01-01  49 Female   65.1         FALSE
+#&gt; 7 P7 2024-01-01  50   Male   74.9          TRUE
+#&gt; 8 P8 2024-01-03  28   Male   64.1          TRUE
+```
+]
+
+--
+
+
+``` r
+example_dataframe$sex
+```
+
+```
+#&gt; [1] "Male"   "Female" "Female" "Female" "Male"   "Female" "Male"   "Male"
+```
+
+--
+
+
+``` r
+# Column name as a "string"
+example_dataframe[['sex']]
+```
+
+```
+#&gt; [1] "Male"   "Female" "Female" "Female" "Male"   "Female" "Male"   "Male"
+```
+
+
+---
+
+# Using columns in functions
+
+.footnote[
+`$` for interactive analysis ... `[[]]` for programming and in functions
+]
+
+.pull-left-40[
+
+Use form `function(dataframe$column)` 
+
+]
+
+.pull-right-60[
+
+
+``` r
+example_dataframe
+```
+
+```
+#&gt;   ID entry_date age    sex weight test_complete
+#&gt; 1 P1 2024-01-02  30   Male   66.2         FALSE
+#&gt; 2 P2 2024-01-02  41 Female   89.9          TRUE
+#&gt; 3 P3 2024-01-01  48 Female   37.4          TRUE
+#&gt; 4 P4 2024-01-02  42 Female   76.8          TRUE
+#&gt; 5 P5 2024-01-02  24   Male   60.3         FALSE
+#&gt; 6 P6 2024-01-01  49 Female   65.1         FALSE
+#&gt; 7 P7 2024-01-01  50   Male   74.9          TRUE
+#&gt; 8 P8 2024-01-03  28   Male   64.1          TRUE
+```
+]
+
+--
+
+
+``` r
+mean(example_dataframe$weight)
+```
+
+```
+#&gt; [1] 66.8375
+```
+
+--
+
+
+``` r
+table(example_dataframe[['sex']])
+```
+
+```
+#&gt; 
+#&gt; Female   Male 
+#&gt;      4      4
+```
+
+---
+
+# Using columns in functions
+
+Plot the `age` and `weight` columns
+
+
+``` r
+plot(x = example_dataframe$age, y = example_dataframe$weight)
+```
+
+&lt;br&gt;
+
+&lt;img src="01-Module-1-R-basics-and-data-import_files/figure-html/unnamed-chunk-176-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Using columns in functions
+
+Sometimes a function takes in a `data=` argument and we do not need `dataframe$...`  
+
+--
+
+Conduct a t-test comparing `weight` between levels of `sex`
+
+
+``` r
+t.test(weight ~ sex, data = example_dataframe)
+#t.test(example_dataframe$weight ~ example_dataframe$sex) # also valid
+```
+
+```
+#&gt; 
+#&gt; 	Welch Two Sample t-test
+#&gt; 
+#&gt; data:  weight by sex
+#&gt; t = 0.079743, df = 3.4565, p-value = 0.9408
+#&gt; alternative hypothesis: true difference in means between group Female and group Male is not equal to 0
+#&gt; 95 percent confidence interval:
+#&gt;  -33.37989  35.22989
+#&gt; sample estimates:
+#&gt; mean in group Female   mean in group Male 
+#&gt;               67.300               66.375
+```
+
+.footnote[
+The tilde symbol `~` is part of a **formula** means "weight explained by sex"
+]
+
+
+---
+
+class: center, middle, inverse
+
+# Exercise time!
+
+.section-subtitle[
+
+Open the file
+
+.inverse[`M01-03-data-types-and-data.frames.R`]
+
+and attempt the exercises.
+
+
+]
+
+---
+
+# Section recap
+
+- examined some data vector properties
+
+- examined some built-in data.frames in R
+
+- obtained information about a data.frame: structure, data types, columns and rows
+
+- conducted some calculations on data.frame columns
+
+- plot data from a data.frame
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: middle
+
+# Using our newly acquired knowledge
+
+---
+
+# Let's conduct a simple analysis in R
+
+We will follow a simple linear regression analysis to see what R can do
+
+- Obtain a dataset
+- Examine the data 
+- Obtain some data summaries
+- Plot the data
+- Fit a linear regression model
+- Obtain the model summary
+- Plot the data with the regression line
+
+--
+
+The **goal for you** is to observe how
+- code is written
+- objects are created
+- you inspect data
+- data columns are selected
+- statistical output is presented ... **no not worry if this is too complex .. just observe!** 
+
+---
+
+# The research question
+
+Is there a relationship between **petal length** and **petal width** of Iris species?
+
+![](images/iris-species-petal-sepal.png)&lt;!-- --&gt;
+
+---
+
+# The research data
+
+`iris` is a dataset within R
+
+
+``` r
+# Show the first and lasst rows of the data
+head(iris)
+```
+
+```
+#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+#&gt; 1          5.1         3.5          1.4         0.2  setosa
+#&gt; 2          4.9         3.0          1.4         0.2  setosa
+#&gt; 3          4.7         3.2          1.3         0.2  setosa
+#&gt; 4          4.6         3.1          1.5         0.2  setosa
+#&gt; 5          5.0         3.6          1.4         0.2  setosa
+#&gt; 6          5.4         3.9          1.7         0.4  setosa
+```
+
+``` r
+tail(iris)
+```
+
+```
+#&gt;     Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+#&gt; 145          6.7         3.3          5.7         2.5 virginica
+#&gt; 146          6.7         3.0          5.2         2.3 virginica
+#&gt; 147          6.3         2.5          5.0         1.9 virginica
+#&gt; 148          6.5         3.0          5.2         2.0 virginica
+#&gt; 149          6.2         3.4          5.4         2.3 virginica
+#&gt; 150          5.9         3.0          5.1         1.8 virginica
+```
+
+---
+
+# A summary of the data
+
+`summary()` will provide a numerical or group summary depending on what is in the column
+
+For `iris`
+
+ - Numerical summaries of sepal and petal measurements
+ - Counts of species from which measurements were obtained
+
+
+
+
+``` r
+summary(iris)
+```
+
+```
+#&gt;   Sepal.Length    Sepal.Width     Petal.Length    Petal.Width          Species  
+#&gt;  Min.   :4.300   Min.   :2.000   Min.   :1.000   Min.   :0.100   setosa    :50  
+#&gt;  1st Qu.:5.100   1st Qu.:2.800   1st Qu.:1.600   1st Qu.:0.300   versicolor:50  
+#&gt;  Median :5.800   Median :3.000   Median :4.350   Median :1.300   virginica :50  
+#&gt;  Mean   :5.843   Mean   :3.057   Mean   :3.758   Mean   :1.199                  
+#&gt;  3rd Qu.:6.400   3rd Qu.:3.300   3rd Qu.:5.100   3rd Qu.:1.800                  
+#&gt;  Max.   :7.900   Max.   :4.400   Max.   :6.900   Max.   :2.500
+```
+
+
+---
+
+# Visualising the data
+
+`plot()` can provide a us with a visualisation of the data. There are arguments for labels and other plot components.
+
+.pull-left[
+
+
+``` r
+plot(x = iris$Petal.Width,
+     y = iris$Petal.Length,
+     main = "Petal width vs petal length",
+     xlab = "Petal width (mm)",
+     ylab = "Petal length (mm)",
+     pch = 19)
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="01-Module-1-R-basics-and-data-import_files/figure-html/unnamed-chunk-236-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Fitting a linear regression model
+
+`lm()` is the linear model function in R
+
+ - It uses a **formula interface** `y ~ x`
+ - The `data= ` is where `y` and `x` come from ... no need for `iris$x` here
+
+
+``` r
+petal_length_width_lm &lt;- lm(Petal.Length ~ Petal.Width, data = iris)
+```
+
+&lt;br&gt;
+--
+
+Printing this object to the console shows only brief information - model coefficients
+
+
+``` r
+petal_length_width_lm
+```
+
+```
+#&gt; 
+#&gt; Call:
+#&gt; lm(formula = Petal.Length ~ Petal.Width, data = iris)
+#&gt; 
+#&gt; Coefficients:
+#&gt; (Intercept)  Petal.Width  
+#&gt;       1.084        2.230
+```
+
+---
+
+# Obtaining a model summary
+
+`summary()` on a linear model object prints detailed model information
+
+
+``` r
+summary(petal_length_width_lm)
+```
+
+.pull-left-66[
+
+```
+#&gt; 
+#&gt; Call:
+#&gt; lm(formula = Petal.Length ~ Petal.Width, data = iris)
+#&gt; 
+#&gt; Residuals:
+#&gt;      Min       1Q   Median       3Q      Max 
+#&gt; -1.33542 -0.30347 -0.02955  0.25776  1.39453 
+#&gt; 
+#&gt; Coefficients:
+#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    
+#&gt; (Intercept)  1.08356    0.07297   14.85   &lt;2e-16 ***
+#&gt; Petal.Width  2.22994    0.05140   43.39   &lt;2e-16 ***
+#&gt; ---
+#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#&gt; 
+#&gt; Residual standard error: 0.4782 on 148 degrees of freedom
+#&gt; Multiple R-squared:  0.9271,	Adjusted R-squared:  0.9266 
+#&gt; F-statistic:  1882 on 1 and 148 DF,  p-value: &lt; 2.2e-16
+```
+]
+
+.pull-right-33[
+
+**Do not worry about these details, other than they are available**
+
+**We will explore them later**
+
+]
+
+---
+
+# Plotting the regression line from the model
+
+We can then link different R tasks together e.g. to plot the regression line from
+the model
+
+```
+#&gt; Coefficients:
+#&gt; (Intercept)  Petal.Width  
+#&gt;       1.084        2.230
+```
+
+.pull-left[
+
+Plot the data then add line using `abline()`
+
+
+``` r
+plot(x = iris$Petal.Width,
+     y = iris$Petal.Length,
+     main = "Petal width vs petal length",
+     xlab = "Petal width (mm)",
+     ylab = "Petal length (mm)",
+     pch = 19)
+
+abline(reg = petal_length_width_lm, 
+       col = 'red', 
+       lwd = 2)
+```
+
+]
+
+
+.pull-right[
+&lt;img src="01-Module-1-R-basics-and-data-import_files/figure-html/unnamed-chunk-240-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+class: center, middle, inverse
+
+# Your turn!
+
+.section-subtitle[
+
+Open the file
+
+.inverse[`M01-04-your-first-analysis.R`]
+
+and fill in the blanks to do you first full analysis in R.
+
+]
+
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: middle
+
+# Extending R with additional R packages
+
+.footnote[
+An R package is additional **bundle of code, data and documentation** to do a specific task
+]
+
+---
+
+# Installing new R packages
+
+R packages live online in curated **repositories** or in the wild on GitHub and other software repository websites.
+
+### CRAN
+
+- **CRAN (Comprehensive R Archive Network)**: This is the primary and **default** repository for 
+R packages. [See the list online.](https://cran.r-project.org/web/packages/available_packages_by_name.html)
+
+--
+
+### Others
+
+- **Bioconductor**:  Specialized in bioinformatics packages. 
+[See the list online.](https://www.bioconductor.org/packages/release/BiocViews.html#___Software)
+
+- **GitHub and other sources**&lt;sup&gt;1&lt;/sup&gt;: Contain source code for packages, from which installation is possible. 
+
+.footnote[
+
+[1] Source code for many of the CRAN and Bioconductor packages live here, but many others that **have not been through quality checking** of CRAN and Bioconductor.
+]
+
+---
+
+# R packages - CRAN
+
+
+We **install** a package onto the computer using `install.package()`:
+
+
+``` r
+install.packages('tidyverse')
+```
+
+.footnote[
+**You should have installed `tidyverse` prior to the course!**
+]
+
+--
+
+&lt;/br&gt;
+
+But to use it in our **current R session**, we must **load** it using `library()`
+
+
+``` r
+library(tidyverse)
+# Now can use tidyverse functions
+```
+
+--
+
+ **Remember**: when you restart R, the package will **no longer** be loaded
+
+
+
+
+---
+
+# Installing verus loading a package
+
+**Installing** a package with `install.package()` downloads the package&lt;sup&gt;1&lt;/sup&gt; to your computer
+ 
+   - You do this once, or when you want to **update** a package
+   - `install.packages()` should **not** be in your scripts
+   
+&lt;img src="images/internet-to-computer.png" width="300px" style="display: block; margin: auto;" /&gt;
+&lt;br&gt;
+&lt;br&gt;
+
+.footnote[
+[1] It may actually download **multiple packages** (including those itself uses)
+]
+
+--
+
+**Loading** a package using `library()` makes the package available to your **current R session**
+ 
+   - You need to load packages very time you start R/RStudio
+   - At the beginning of your R scripts you should load the packages required
+   
+&lt;img src="images/computer-to-R.png" width="300px" style="display: block; margin: auto;" /&gt;
+
+---
+
+# What R packages do you have?
+
+The RStudio 'Packages' tab details this
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="images/rstudio-screenshot-packages.png" alt="RStudio packages" width="650px" /&gt;
+&lt;p class="caption"&gt;RStudio packages&lt;/p&gt;
+&lt;/div&gt;
+
+---
+
+# Do I have this R package?
+
+
+``` r
+library(dundermifflin)
+```
+
+.red[
+
+```
+#&gt; Error in library(dundermifflin): there is no package called 'dundermifflin'
+```
+]
+
+
+
+
+
+
+&lt;/br&gt;
+--
+
+**Therefore** 
+
+
+``` r
+install.packages('dundermifflin')
+```
+
+
+```
+#&gt; Installing package into ...
+#&gt; ...
+#&gt; package ‘dundermifflin’ successfully unpacked and MD5 sums checked
+```
+
+--
+
+
+``` r
+library(dundermifflin)
+get_quote()
+```
+
+
+```
+#&gt; Is this the same grill you grilled your foot on?
+#&gt; ~ Ryan
+#&gt; Season 3, Episode 14 - Ben Franklin
+```
+
+---
+
+# Exploring the documentation of a package in RStudio
+
+.pull-left[
+
+![](images/packages-tab.png)&lt;!-- --&gt;
+
+]
+
+--
+
+.pull-right[
+
+![](images/package-documentation.png)&lt;!-- --&gt;
+
+]
+
+---
+
+# The tidyverse set of packages
+
+&lt;img src="images/tidyverse.png" width="83%" style="display: block; margin: auto;" /&gt;
+
+.footnote[
+
+ [https://www.tidyverse.org/](https://www.tidyverse.org/)
+
+]
+
+---
+
+# Namespacing
+
+**Namespacing** allows us explicitly use a function from a given package (or even without loading the package)
+
+ - `package_name::function_name` (use the double colon)
+ 
+--
+
+**E.g.** with 2 packages have the same function name e.g `filter()` is a common function name!
+
+.pull-left[
+
+``` r
+stats::filter
+```
+]
+
+.pull-right[
+
+``` r
+dplyr::filter
+```
+]
+
+--
+ 
+**E.g.** 
+
+
+
+
+``` r
+readr::read_csv('../../data/penguins.csv', show_col_types = FALSE)
+```
+
+```
+#&gt; # A tibble: 344 × 8
+#&gt;   species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g sex     year
+#&gt;   &lt;chr&gt;   &lt;chr&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt;
+#&gt; 1 Adelie  Torgersen           39.1          18.7               181        3750 male    2007
+#&gt; 2 Adelie  Torgersen           39.5          17.4               186        3800 female  2007
+#&gt; 3 Adelie  Torgersen           40.3          18                 195        3250 female  2007
+#&gt; 4 Adelie  Torgersen           NA            NA                  NA          NA &lt;NA&gt;    2007
+#&gt; 5 Adelie  Torgersen           36.7          19.3               193        3450 female  2007
+#&gt; 6 Adelie  Torgersen           39.3          20.6               190        3650 male    2007
+#&gt; # ℹ 338 more rows
+```
+ 
+
+.footnote[
+Using RStudio tab completion with `package_name::` lists all of it's functions!
+]
+
+---
+
+class: center, middle, inverse
+
+# R packages exercises 
+
+.section-subtitle[
+
+Will be conducted for homework 
+
+(at the end of the module)
+
+]
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: middle
+
+# Import and export of (tabular) data
+
+---
+
+# Overview
+
+
+R can import and export many file types ... but this may depend on additional R packages
+
+- text files: CSV, TSV
+- Excel spreadsheets
+- Files from other statistical programs: SAS, SPSS, Stata, ...
+- Databases
+- Online: googlesheets
+- R's own files types: `.rds` and `.Rdata`
+
+&lt;img src="images/r-import-export.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+.footnote[
+Figure from https://epirhandbook.com/
+]
+
+---
+
+# The import result is typically a data.frame
+
+
+A new **data frame** object from a **file** on your computer or from the internet using a **file path&lt;sup&gt;1&lt;/sup&gt;** as input
+
+
+
+
+``` r
+penguins &lt;- read.csv(file = 'data/penguins.csv')
+```
+
+.footnote[
+[1] File paths are a location on your computer. Often a difficulty for beginners to understand, we will examine in exercises.
+]
+--
+
+
+``` r
+# View the first 6 rows
+head(penguins)
+```
+
+```
+#&gt;   species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g    sex year
+#&gt; 1  Adelie Torgersen           39.1          18.7               181        3750   male 2007
+#&gt; 2  Adelie Torgersen           39.5          17.4               186        3800 female 2007
+#&gt; 3  Adelie Torgersen           40.3          18.0               195        3250 female 2007
+#&gt; 4  Adelie Torgersen             NA            NA                NA          NA   &lt;NA&gt; 2007
+#&gt; 5  Adelie Torgersen           36.7          19.3               193        3450 female 2007
+#&gt; 6  Adelie Torgersen           39.3          20.6               190        3650   male 2007
+```
+
+---
+
+# Mastering data import
+
+### File paths
+
+  - Where the file located on your computer or externally
+  - Where that location is relative to your R working directory
+  
+### File types
+
+- What type of file are you importing?
+- What function imports that file type?
+
+### Structure of the raw data
+
+- Column names
+- Missing value coding
+- Comment lines
+
+### Mastering these will reduce file import problems ...
+
+---
+
+
+# Common data files are **text** data files 
+
+Comma-separated values (CSV) **text files** are the most common type of data files
+
+- Columns are separated (or delimited) by a comma `,`
+
+```
+Student ID,Full Name,favourite.food,mealPlan,AGE
+1,Sunil Huffmann,Strawberry yoghurt,Lunch only,4
+2,Barclay Lynn,French fries,Lunch only,5
+3,Jayendra Lyne,N/A,Breakfast and lunch,7
+4,Leon Rossini,Anchovies,Lunch only,
+5,Chidiegwu Dunkel,Pizza,Breakfast and lunch,five
+6,Güvenç Attila,Ice cream,Lunch only,6
+```
+
+--
+
+.pull-left[
+
+but other delimiters exist and are **used frequently!**
+
+  - tab = `\t` . . . `file.tsv`, `file.txt`
+  - pipe = `|` . . . `file.psv`, `file.txt`
+  - colon = `;`
+  - space = `\s`
+]
+
+--
+
+.pull-right[
+R can import these natively using the `read.*` functions
+
+
+``` r
+read.csv()
+read.delim()
+...
+```
+
+
+but we will use the package  **`readr`**
+
+]
+
+---
+
+# Importing a CSV file with **`readr`**
+
+The **`readr`** improves importing text files into R
+
+- provides useful information about the import of the data
+- returns a **tibble** data.frame
+
+
+``` r
+# Part of the core tidyverse, loaded with
+library(tidyverse)
+# or
+library(readr)
+```
+
+--
+
+using `read_csv()` 
+
+
+``` r
+students &lt;- read_csv(file = "data/students.csv")
+```
+
+
+
+--
+
+
+```
+#&gt; Rows: 6 Columns: 5
+#&gt; ── Column specification ─────────────────────────────────────────────────────────────────────
+#&gt; Delimiter: ","
+#&gt; chr (4): Full Name, favourite.food, mealPlan, AGE
+#&gt; dbl (1): Student ID
+#&gt; 
+#&gt; ℹ Use `spec()` to retrieve the full column specification for this data.
+#&gt; ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+```
+
+
+
+---
+
+# a **tibble** data.frame
+
+A **tibble** is an improved type data.frame
+
+- functions as data.frame but has better properties
+- prints data.frame information to the console - column and row numbers, column types
+
+
+``` r
+students
+```
+
+```
+#&gt; # A tibble: 6 × 5
+#&gt;   `Student ID` `Full Name`      favourite.food     mealPlan            AGE    
+#&gt;          &lt;dbl&gt; &lt;chr&gt;            &lt;chr&gt;              &lt;chr&gt;               &lt;chr&gt;  
+#&gt; 1            1 Sunil Huffmann   Strawberry yoghurt Lunch only          4      
+#&gt; 2            2 Barclay Lynn     French fries       Lunch only          5      
+#&gt; 3            3 Jayendra Lyne    N/A                Breakfast and lunch 7      
+#&gt; 4            4 Leon Rossini     Anchovies          Lunch only          &lt;NA&gt;   
+#&gt; 5            5 Chidiegwu Dunkel Pizza              Breakfast and lunch unknown
+#&gt; 6            6 Güvenç Attila    Ice cream          Lunch only          6
+```
+
+.footnote[
+https://tibble.tidyverse.org/
+]
+
+---
+
+# a **tibble** data.frame
+
+A **tibble** is an improved type data.frame
+
+- functions as data.frame but has better properties
+- prints data.frame information to the console - column and row numbers, column types
+
+
+``` r
+students
+```
+
+
+```
+#&gt;   Student ID        Full Name     favourite.food            mealPlan     AGE
+#&gt; 1          1   Sunil Huffmann Strawberry yoghurt          Lunch only       4
+#&gt; 2          2     Barclay Lynn       French fries          Lunch only       5
+#&gt; 3          3    Jayendra Lyne                N/A Breakfast and lunch       7
+#&gt; 4          4     Leon Rossini          Anchovies          Lunch only    &lt;NA&gt;
+#&gt; 5          5 Chidiegwu Dunkel              Pizza Breakfast and lunch unknown
+#&gt; 6          6    Güvenç Attila          Ice cream          Lunch only       6
+```
+*data.frame
+
+.footnote[
+https://tibble.tidyverse.org/
+]
+
+---
+
+# Other text file types
+
+You may also encounter **delimiters** (separators), which **`readr`** (and R) can handle with other functions 
+
+--
+
+.pull-left[
+
+**tab-separated (TSV)** 
+
+
+``` r
+read_tsv('files.txt')
+```
+
+```
+x   y   z
+1   2   3
+4   5   6
+```
+
+
+```
+#&gt; # A tibble: 2 × 1
+#&gt;   `x   y   z`
+#&gt;   &lt;chr&gt;      
+#&gt; 1 1   2   3  
+#&gt; 2 4   5   6
+```
+
+]
+
+--
+
+.pull-right[
+
+**pipe-separated** or **any other delimiter**
+
+
+``` r
+read_delim('files.psv', delim = '|')`
+```
+
+```
+x|y|z
+1|2|3
+4|5|6
+```
+
+
+```
+#&gt; # A tibble: 2 × 3
+#&gt;       x     y     z
+#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1     1     2     3
+#&gt; 2     4     5     6
+```
+]
+
+
+
+
+
+---
+
+# Controlling data import
+
+There are numerous options when importing data that will help streamline the import process
+when dealing with large or messy datasets
+
+- defining missing values
+- skipping metadata lines
+- defining column names
+- specifying column data types
+- limiting the number of rows imported
+- and others depending on the type of data being imported
+
+--
+
+We will explore a few of these ..
+
+--
+
+Remember to **read the function help documentation** to learn about what options are available
+in the case that are having import problems
+
+---
+
+# Controlling import - missing values
+
+Missing values are often **coded differently in different raw data** e.g. `N/A`, `""`, `unknown`, etc
+
+- a **blank value** is a default missing value for R
+- otherwise a text value e.g `"N/A"` will be imported and not an R missing value `NA`
+- this can affect the column data type too ... `AGE` is `&lt;chr&gt;`
+
+
+``` r
+students &lt;- read_csv(file = "data/students.csv")
+```
+
+--
+
+
+```
+#&gt; # A tibble: 6 × 5
+#&gt;   `Student ID` `Full Name`      favourite.food     mealPlan            AGE    
+#&gt;          &lt;dbl&gt; &lt;chr&gt;            &lt;chr&gt;              &lt;chr&gt;               &lt;chr&gt;  
+#&gt; 1            1 Sunil Huffmann   Strawberry yoghurt Lunch only          4      
+#&gt; 2            2 Barclay Lynn     French fries       Lunch only          5      
+*#&gt; 3            3 Jayendra Lyne    N/A                Breakfast and lunch 7      
+*#&gt; 4            4 Leon Rossini     Anchovies          Lunch only          &lt;NA&gt;   
+*#&gt; 5            5 Chidiegwu Dunkel Pizza              Breakfast and lunch unknown
+#&gt; 6            6 Güvenç Attila    Ice cream          Lunch only          6
+```
+
+.footnote[
+`N/A` = the characters "N/A" and not a missing value. `&lt;NA&gt;` or  `NA` = true missing value.
+]
+
+---
+
+# Controlling import - missing values
+
+`na` argument - define what are missing values e.g. 'N/A', '', 'missing', etc 
+
+
+
+
+``` r
+students &lt;- read_csv(file = "data/students.csv", na = c('', 'N/A', 'unknown'))
+```
+
+--
+
+
+```
+#&gt; # A tibble: 6 × 5
+#&gt;   `Student ID` `Full Name`      favourite.food     mealPlan              AGE
+#&gt;          &lt;dbl&gt; &lt;chr&gt;            &lt;chr&gt;              &lt;chr&gt;               &lt;dbl&gt;
+#&gt; 1            1 Sunil Huffmann   Strawberry yoghurt Lunch only              4
+#&gt; 2            2 Barclay Lynn     French fries       Lunch only              5
+*#&gt; 3            3 Jayendra Lyne    &lt;NA&gt;               Breakfast and lunch     7
+*#&gt; 4            4 Leon Rossini     Anchovies          Lunch only             NA
+*#&gt; 5            5 Chidiegwu Dunkel Pizza              Breakfast and lunch    NA
+#&gt; 6            6 Güvenç Attila    Ice cream          Lunch only              6
+```
+
+- `favourite.food` has correct `&lt;NA&gt;` value   
+- `AGE` is now `&lt;dbl&gt;` (numeric)
+
+---
+
+# Controlling import - skipping lines
+
+Data files may have metadata or comments, which can be skipped with `skip` or `comment` arguments 
+
+--
+
+.pull-left[
+File
+
+```
+This file was produced by ...
+It contains data for ...
+x,y,z
+1,2,3
+4,5,6
+```
+]
+
+--
+
+.pull-right[
+
+R - skip first 2 lines
+
+
+``` r
+read_csv('files.csv', skip = 2)
+```
+
+
+```
+#&gt; # A tibble: 2 × 3
+#&gt;       x     y     z
+#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1     1     2     3
+#&gt; 2     4     5     6
+```
+
+]
+
+--
+
+.pull-left[
+
+File
+
+```
+# This file was produced by ...
+# It contains data for ...
+x,y,z
+1,2,3
+4,5,6
+```
+]
+
+--
+
+.pull-right[
+
+R - skip lines starting with #
+
+
+``` r
+read_csv('file.csv', comment = "#")
+```
+
+
+```
+#&gt; # A tibble: 2 × 3
+#&gt;       x     y     z
+#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1     1     2     3
+#&gt; 2     4     5     6
+```
+
+]
+
+
+---
+
+# Controlling import - columns names
+
+Sometimes files have no column names (they given elsewhere in a data dictionary) ... a data.frame **requires columns names** and the **first line is expected to be column names**. 
+
+We can `col_names` to specify none or provide them ourselves  
+
+.pull-left[
+
+File (without column names)
+
+```
+1,2,3
+4,5,6
+7,8,9
+```
+]
+--
+
+.pull-right[
+
+``` r
+# first row becomes names
+read_csv('file.csv') 
+```
+
+
+```
+#&gt; # A tibble: 2 × 3
+#&gt;     `1`   `2`   `3`
+#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1     4     5     6
+#&gt; 2     7     8     9
+```
+]
+
+--
+
+.pull-left-40[
+
+
+``` r
+read_csv('file.csv', col_names = FALSE)
+```
+
+
+```
+#&gt; # A tibble: 3 × 3
+#&gt;      X1    X2    X3
+#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1     1     2     3
+#&gt; 2     4     5     6
+#&gt; 3     7     8     9
+```
+]
+
+--
+
+.pull-right-50[
+
+``` r
+read_csv('file.csv', col_names = c("x", "y", "z"))
+```
+
+
+```
+#&gt; # A tibble: 3 × 3
+#&gt;       x     y     z
+#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1     1     2     3
+#&gt; 2     4     5     6
+#&gt; 3     7     8     9
+```
+]
+
+
+---
+
+class: middle
+
+# Importing Excel data
+
+- choosing sheets
+- controlling import (missing values, skipping metadata lines, importing cell ranges)
+
+---
+
+# Importing Excel sheets with **`readxl`**
+
+The **`readxl`** package makes it easy to get data out of Excel and into R. 
+
+
+``` r
+library(readxl)
+```
+
+--
+
+
+``` r
+# note the sheet parameter
+read_excel(path = 'data/penguins.xlsx', sheet = 'Adelie')
+```
+
+--
+
+
+```
+#&gt; # A tibble: 152 × 8
+#&gt;   species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g sex     year
+#&gt;   &lt;chr&gt;   &lt;chr&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt;
+#&gt; 1 Adelie  Torgersen           39.1          18.7               181        3750 male    2007
+#&gt; 2 Adelie  Torgersen           39.5          17.4               186        3800 female  2007
+#&gt; 3 Adelie  Torgersen           40.3          18                 195        3250 female  2007
+#&gt; 4 Adelie  Torgersen           NA            NA                  NA          NA &lt;NA&gt;    2007
+#&gt; 5 Adelie  Torgersen           36.7          19.3               193        3450 female  2007
+#&gt; 6 Adelie  Torgersen           39.3          20.6               190        3650 male    2007
+#&gt; 7 Adelie  Torgersen           38.9          17.8               181        3625 female  2007
+#&gt; 8 Adelie  Torgersen           39.2          19.6               195        4675 male    2007
+#&gt; # ℹ 144 more rows
+```
+
+.footnote[
+https://readxl.tidyverse.org/
+]
+
+---
+
+# Listing sheets in an excel file
+
+This is useful to help with identifying sheet names to import
+
+
+```
+#&gt; [1] "Adelie"    "Gentoo"    "Chinstrap"
+```
+
+
+``` r
+excel_sheets(path = 'data/penguins.xlsx')
+```
+
+--
+
+&lt;br&gt;
+
+
+``` r
+read_excel(path = 'data/penguins.xlsx', sheet = 'Chinstrap')
+```
+
+
+```
+#&gt; # A tibble: 68 × 8
+#&gt;   species   island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g sex     year
+#&gt;   &lt;chr&gt;     &lt;chr&gt;           &lt;dbl&gt;         &lt;dbl&gt;             &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt;
+#&gt; 1 Chinstrap Dream            46.5          17.9               192        3500 female  2007
+#&gt; 2 Chinstrap Dream            50            19.5               196        3900 male    2007
+#&gt; 3 Chinstrap Dream            51.3          19.2               193        3650 male    2007
+#&gt; 4 Chinstrap Dream            45.4          18.7               188        3525 female  2007
+#&gt; 5 Chinstrap Dream            52.7          19.8               197        3725 male    2007
+#&gt; 6 Chinstrap Dream            45.2          17.8               198        3950 female  2007
+#&gt; 7 Chinstrap Dream            46.1          18.2               178        3250 female  2007
+#&gt; 8 Chinstrap Dream            51.3          18.2               197        3750 male    2007
+#&gt; # ℹ 60 more rows
+```
+
+
+---
+
+# Controlling import - missing values, skipping rows, column names
+
+As with other **`readr`** functions
+
+
+``` r
+# Define missing value characters
+read_excel(..., na = c('Missing', '', 'N/A'))
+```
+
+
+``` r
+# Skip first 2 rows
+read_excel(..., skip = 2)
+```
+
+
+``` r
+# No column names
+read_excel(..., col_names = FALSE)
+```
+
+---
+
+# Controlling import - cell ranges
+
+We can define excel type ranges with the `range` argument
+
+
+``` r
+read_excel(path = '../../data/penguins.xlsx', sheet = 'Gentoo', 
+*          range = "A1:D4")
+```
+
+```
+#&gt; # A tibble: 3 × 4
+#&gt;   species island bill_length_mm bill_depth_mm
+#&gt;   &lt;chr&gt;   &lt;chr&gt;           &lt;dbl&gt;         &lt;dbl&gt;
+#&gt; 1 Gentoo  Biscoe           46.1          13.2
+#&gt; 2 Gentoo  Biscoe           50            16.3
+#&gt; 3 Gentoo  Biscoe           48.7          14.1
+```
+
+&lt;img src="images/readxl-cell-range.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: middle
+
+# Other data types
+
+---
+
+# Other data types
+
+From R
+
+- `.rds` objects saved from R, e.g. a data.frame, vector, list
+- keeps any formatting previously applied in R
+
+
+``` r
+fish &lt;- readr::read_rds("data/fish-lengths.rds")
+```
+
+--
+
+From statistical programs using **`haven`** from the tidyverse
+
+
+``` r
+haven::read_sas()
+haven::read_spss()
+```
+
+--
+
+Googlesheets using **`googlesheets4`**
+
+
+``` r
+googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1U6Cf_qEOhiR9A...")
+```
+
+And from many others e.g. databases, spatial data, genomic data, ...
+
+.footnote[
+https://haven.tidyverse.org/ https://googlesheets4.tidyverse.org/
+]
+
+--
+
+.text-xl[
+Unsure which package to use? Google .text-075[`how to import {file type} in R?`]
+]
+
+---
+
+# Exporting data
+
+We typically export data from R after data cleaning and transformation. 
+
+- Data is most often exported into text data files (`.csv`, etc) or R data files (`.rds`).
+
+- Exporting to Excel is done less often and requires other R packages (not explored here).
+
+- Any data type formatting applied in R will be **lost with text data files** but 
+**retained with R data files**. The choice depends on downstream use of the data.
+
+- **Read function documentation** to know your export options
+
+--
+
+
+``` r
+# Export CSV
+write_csv(x = my_dataframe, file = 'path/to/file.csv')
+
+# Export tab delimited, NA value will be blank
+write_delim(x = my_dataframe, file = 'path/to/file.csv', delim = "\t", na = "")
+
+# Export an R data file
+write_rds(x = my_dataframe, file = 'path/to/file.rds')
+```
+
+---
+class: middle, inverse
+
+# Let's import data into R ... but first ...
+
+---
+
+class: middle
+
+# A note on data organisation in spreadsheets
+
+---
+
+# Spreadsheets often organised for humans not computers
+
+This create immense difficulties for data import!
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="images/messy-spreadsheet.png" alt="Spreadsheet organised for human not computer" width="65%" /&gt;
+&lt;p class="caption"&gt;Spreadsheet organised for human not computer&lt;/p&gt;
+&lt;/div&gt;
+
+---
+
+# Better data organization in spreadsheets&lt;sup&gt;1&lt;/sup&gt;
+
+When collecting data, follow these basic principles:
+
+- organize the data as a single rectangle 
+- observations as rows, variables as columns, and a single header row
+- do not include calculations in the raw data files
+- do not use font color or highlighting as data
+- put just one thing in a cell, 
+- do not leave any cells empty, 
+- be consistent
+- write dates like YYYY-MM-DD, 
+- create a data dictionary
+- choose good names for things
+- make backups
+- use data validation to avoid data entry errors
+- save the data in plain text files
+
+
+.footnote[
+[1] Broman, K. W., &amp; Woo, K. H. (2018). Data Organization in Spreadsheets. The American Statistician, 72(1), 2–10. https://doi.org/10.1080/00031305.2017.1375989
+]
+
+---
+
+# Better data organization in spreadsheets&lt;sup&gt;1&lt;/sup&gt;
+
+Prepare your data in a **tidy** format **before** using R
+
+&lt;img src="images/untidy-tidy-data.png" width="90%" /&gt;
+
+.footnote[
+Broman, K. W., &amp; Woo, K. H. (2018). Data Organization in Spreadsheets. The American Statistician, 72(1), 2–10. https://doi.org/10.1080/00031305.2017.1375989
+]
+
+---
+
+class: center, middle, inverse
+
+# Final exercises for module 1
+
+.section-subtitle[
+
+Complete the exercises in each of the two files
+
+.inverse[`M01-05-R-packages.R`]
+
+.inverse[`M01-06-data-import-export.R`]
+
+]
+
+
+---
+
+class: middle, center
+
+# End of module 1
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "ratio": "16:9",
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
