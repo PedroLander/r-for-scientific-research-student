@@ -7,6 +7,11 @@
 This repository holds the course material for the R for Scientific
 Research - Madrid 2025.
 
+Lecture notes are in the `lecture-notes/` folder as HTML files
+
+Slides hosted online can be found
+[here](https://shaunson26.github.io/r-for-scientific-research/)
+
 ## Downloading the content
 
 Ensure you have R, RStudio and git installed
