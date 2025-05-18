@@ -12,7 +12,7 @@ Lecture notes are in the `lecture-notes/` folder as HTML files
 Slides hosted online can be found
 [here](https://shaunson26.github.io/r-for-scientific-research/)
 
-## Downloading the content
+## Downloading the content from RStudio
 
 Ensure you have R, RStudio and git installed
 
