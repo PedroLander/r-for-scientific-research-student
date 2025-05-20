@@ -1,5 +1,5 @@
 
-# R for Scientific Research - Madrid 2025
+# R for Data Analysis in Scientific Research - Madrid 2025
 
 <!-- badges: start -->
 <!-- badges: end -->
