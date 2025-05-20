@@ -1,0 +1,2329 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Module 2 - Data import and manipulation</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="" />
+    <script src="libs/header-attrs-2.29/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+# Reminders
+
+- **Lecture notes**
+  - in `lecture-notes/` folder as HTML files
+  - Github - https://shaunson26.github.io/r-for-scientific-research/
+  
+- **Exercise answers**
+  - in `student-material/` folder as HTML files
+  
+- **Zoom recording**
+  - link was emailed to you
+  
+## Download todays course content
+
+In RStudio with the course project open - **git** panel and **pull** 
+
+&lt;img src="images/git-pull.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# A gentler introduction to R
+
+See the document I emailed you. It provides a simpler introduction to R.
+
+
+---
+
+class: middle, inverse, title
+
+
+
+# Module 2 - Data manipulation and transformation with tidyverse 
+
+.section-subtitle[
+
+- Creating new columns  
+- Summarising data  
+- Subsetting data
+- Arranging data
+- Reshaping data  
+- Joining data  
+
+]
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: middle
+
+# Your data is in R, now what?
+
+---
+
+# Immediate questions
+
+With relatively clean data, your immediate questions might be:
+
+- Can I calculate a new metric based on my measurements?
+
+- What are the average values for my different groups?
+
+- Can I analyse a subset of my data?
+
+
+Or when you know you need to check and clean your data:
+
+- What values are present and do I need to fix them?
+
+- Are there outliers and unusual values?
+
+- Are the data types correct?
+
+---
+
+
+# Data transformation and manipulation with **`dplyr`**
+
+**`dplyr`** is a grammar of data manipulation, providing a consistent set of **function verbs** that help you solve the most common data manipulation challenges:
+
+.footnote[
+https://dplyr.tidyverse.org//
+]
+
+--
+
+.pull-left-70[
+Some verbs include
+
+- `mutate()` adds new columns that are functions of existing columns
+- `select()` picks columns based on their names
+- `filter()` picks rows based on their values
+- `arrange()` changes the ordering of the rows
+- `summarise()` reduces multiple values down to a single summary
+]
+
+.pull-right-30[
+&lt;img src="images/dplyr-logo.png" width="50%" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+
+``` r
+# Part of the core tidyverse, loaded with
+library(tidyverse)
+# or
+library(dplyr)
+```
+
+
+---
+
+# All the functions - verbs - have the same structure
+
+1. The first argument is always a data frame.
+
+2. The subsequent arguments typically describe which columns to operate on, using the variable names (without quotes).
+
+3. The output is always a new data frame.
+
+
+
+``` r
+mutate(data, log_column1 = log(column1))
+select(data, column1, column2)
+filter(data, column1 &gt; 100)
+```
+
+
+---
+
+# **`dplyr`** expects to be working on columns of the input data
+
+This helps reduce type and make code easier to understand
+
+E.g. filter rows where values in column `year` are equal to 2013
+
+.pull-left[
+**indexing (base R)**
+
+``` r
+data[ data$year == 2013,]
+```
+]
+
+
+.pull-right[
+**dplyr**
+
+``` r
+filter(data, year == 2013)
+```
+]
+
+&lt;br&gt;
+&lt;br&gt;
+
+--
+
+
+And introduces the **pipe operator** `|&gt;`&lt;sup&gt;1&lt;/sup&gt;
+
+.pull-left[
+
+
+``` r
+data[ data$year == 2013, c('col1', 'col2')]
+```
+
+]
+
+.pull-right[
+
+
+``` r
+data |&gt; 
+  filter(year == 2013) |&gt;  
+  select(col1, col2)
+```
+
+
+]
+
+.footnote[
+[1] You may see `%&gt;%` as the pipe (the original pipe from the **`magrittr`** package), now included in R as `|&gt;`
+]
+
+---
+
+# The pipe operator `|&gt;`
+
+Passes an object to the first argument of the following function
+
+
+
+``` r
+data |&gt;
+  summary()
+```
+
+equates to
+
+
+``` r
+summary(object = data)
+```
+
+
+--
+
+Allows you to **chain multiple steps** into a clear, readable code that shows your *intent* 
+
+
+``` r
+data |&gt;
+  filter(year == 2013) |&gt;  
+  select(col1, col2)
+```
+
+--
+
+otherwise would be achieved like this
+
+
+``` r
+select(filter(data, year == 2013), col1, col1)
+# or
+data_filtered &lt;- filter(data, year == 2013)
+data_filtered_selected &lt;- select(data_filtered, col1, col1)
+```
+
+
+
+---
+
+# Data for the following examples
+
+We will use the `iris` and `penguins` datasets as you are familiar with them from the exercises
+
+
+
+
+``` r
+iris
+```
+
+```
+#&gt; # A tibble: 150 × 5
+#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+#&gt;          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;  
+#&gt; 1          5.1         3.5          1.4         0.2 setosa 
+#&gt; 2          4.9         3            1.4         0.2 setosa 
+#&gt; 3          4.7         3.2          1.3         0.2 setosa 
+#&gt; 4          4.6         3.1          1.5         0.2 setosa 
+#&gt; 5          5           3.6          1.4         0.2 setosa 
+#&gt; # ℹ 145 more rows
+```
+
+``` r
+penguins
+```
+
+```
+#&gt; # A tibble: 344 × 8
+#&gt;   species island    bill_len bill_dep flipper_len body_mass sex     year
+#&gt;   &lt;fct&gt;   &lt;fct&gt;        &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt;     &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+#&gt; 1 Adelie  Torgersen     39.1     18.7         181      3750 male    2007
+#&gt; 2 Adelie  Torgersen     39.5     17.4         186      3800 female  2007
+#&gt; 3 Adelie  Torgersen     40.3     18           195      3250 female  2007
+#&gt; 4 Adelie  Torgersen     NA       NA            NA        NA &lt;NA&gt;    2007
+#&gt; 5 Adelie  Torgersen     36.7     19.3         193      3450 female  2007
+#&gt; # ℹ 339 more rows
+```
+
+---
+
+# Note about the code in the following examples
+
+The code is **not assigning results to objects**, rather **printing the console for demonstration purposes**.
+
+
+``` r
+# Print to console
+iris |&gt; 
+  filter(Sepal.Length &gt; 7.5)
+```
+
+```
+#&gt; # A tibble: 6 × 5
+#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species  
+#&gt;          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;    
+#&gt; 1          7.6         3            6.6         2.1 virginica
+#&gt; 2          7.7         3.8          6.7         2.2 virginica
+#&gt; 3          7.7         2.6          6.9         2.3 virginica
+#&gt; 4          7.7         2.8          6.7         2   virginica
+#&gt; 5          7.9         3.8          6.4         2   virginica
+#&gt; # ℹ 1 more row
+```
+
+--
+
+We would save the result in a real analysis, as we likely need to use the object later
+
+
+``` r
+# Assign to object for future use
+iris_long_sepal &lt;-
+  iris |&gt; 
+  filter(Sepal.Length &gt; 7.5)
+```
+
+--
+
+ **Note:** remember this for the exercises .. priting for demonstration, assigning for later use ...
+
+---
+
+# `count()` cunting Observations by Group
+
+`count()` is used to quickly determine and display the number of observations for each unique combination of specified variables in a data frame.
+
+.pull-left[
+
+``` r
+iris |&gt; 
+  count(Species)
+```
+
+```
+#&gt; # A tibble: 3 × 2
+#&gt;   Species        n
+#&gt;   &lt;fct&gt;      &lt;int&gt;
+#&gt; 1 setosa        50
+#&gt; 2 versicolor    50
+#&gt; 3 virginica     50
+```
+]
+
+--
+
+
+
+.pull-right[
+
+``` r
+penguins |&gt; 
+  count(species, sex)
+```
+
+```
+#&gt; # A tibble: 8 × 3
+#&gt;   species   sex        n
+#&gt;   &lt;fct&gt;     &lt;fct&gt;  &lt;int&gt;
+#&gt; 1 Adelie    female    73
+#&gt; 2 Adelie    male      73
+#&gt; 3 Adelie    &lt;NA&gt;       6
+#&gt; 4 Chinstrap female    34
+#&gt; 5 Chinstrap male      34
+#&gt; 6 Gentoo    female    58
+#&gt; 7 Gentoo    male      61
+#&gt; 8 Gentoo    &lt;NA&gt;       5
+```
+]
+
+---
+
+# `summarise()` summarise values
+
+&lt;style type="text/css"&gt;
+.dplyr-summarise {
+position: absolute;
+top: 0%;
+right: 2%;
+width: 400px;
+}
+&lt;/style&gt;
+
+.dplyr-summarise[
+![](images/summary.png)&lt;!-- --&gt;
+]
+
+
+Calculates a single summary statistic 
+
+
+``` r
+iris|&gt;
+  summarise(mean_sepal_length = mean(Sepal.Length))
+```
+
+```
+#&gt; # A tibble: 1 × 1
+#&gt;   mean_sepal_length
+#&gt;               &lt;dbl&gt;
+#&gt; 1              5.84
+```
+
+--
+
+but this becomes more useful when we include **grouping attributes** in the data
+
+
+``` r
+iris|&gt;
+  group_by(Species) |&gt; 
+  summarise(mean_sepal_length = mean(Sepal.Length))
+```
+
+```
+#&gt; # A tibble: 3 × 2
+#&gt;   Species    mean_sepal_length
+#&gt;   &lt;fct&gt;                  &lt;dbl&gt;
+#&gt; 1 setosa                  5.01
+#&gt; 2 versicolor              5.94
+#&gt; 3 virginica               6.59
+```
+
+
+---
+
+# `group_by` group rows 
+
+&lt;style type="text/css"&gt;
+.dplyr-group {
+position: absolute;
+top: 3%;
+right: 2%;
+width: 400px;
+}
+&lt;/style&gt;
+
+.dplyr-group[
+![](images/group_summary.png)&lt;!-- --&gt;
+]
+
+`group_by()` creates a **grouping attribute** within the data
+- subsequent operations are conducted by groups and then combined
+- "split-apply-combine" approach
+
+
+``` r
+iris|&gt;
+  group_by(Species)
+```
+
+--
+
+
+```
+#&gt; # A tibble: 150 × 5
+*#&gt; # Groups:   Species [3]
+#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+#&gt;          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;  
+#&gt; 1          5.1         3.5          1.4         0.2 setosa 
+#&gt; 2          4.9         3            1.4         0.2 setosa 
+#&gt; 3          4.7         3.2          1.3         0.2 setosa 
+#&gt; 4          4.6         3.1          1.5         0.2 setosa 
+#&gt; 5          5           3.6          1.4         0.2 setosa 
+#&gt; # ℹ 145 more rows
+```
+
+---
+
+# `group_by()` + `summarise()` summarising by group
+
+Any number of summaries can be included
+- `n()` is a dplyr function to return the number of rows in a group
+
+
+``` r
+iris|&gt;
+  group_by(Species)|&gt;
+  summarise(
+    n = n(),
+    mean_sepal_length = mean(Sepal.Length),
+    sd_sepal_length = sd(Sepal.Length),
+    min_sepal_length = min(Sepal.Length),
+    mean_sepal_width = mean(Sepal.Width)
+  )
+```
+
+```
+#&gt; # A tibble: 3 × 6
+#&gt;   Species        n mean_sepal_length sd_sepal_length min_sepal_length mean_sepal_width
+#&gt;   &lt;fct&gt;      &lt;int&gt;             &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+#&gt; 1 setosa        50              5.01           0.352              4.3             3.43
+#&gt; 2 versicolor    50              5.94           0.516              4.9             2.77
+#&gt; 3 virginica     50              6.59           0.636              4.9             2.97
+```
+
+---
+
+
+# `group_by()` can use multiple columns
+
+You can create groups using combinations of columns
+
+
+``` r
+penguins|&gt;
+  group_by(species, island) 
+```
+
+--
+
+
+```
+#&gt; # A tibble: 344 × 8
+*#&gt; # Groups:   species, island [5]
+#&gt;   species island    bill_len bill_dep flipper_len body_mass sex     year
+#&gt;   &lt;fct&gt;   &lt;fct&gt;        &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt;     &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+#&gt; 1 Adelie  Torgersen     39.1     18.7         181      3750 male    2007
+#&gt; 2 Adelie  Torgersen     39.5     17.4         186      3800 female  2007
+#&gt; 3 Adelie  Torgersen     40.3     18           195      3250 female  2007
+#&gt; 4 Adelie  Torgersen     NA       NA            NA        NA &lt;NA&gt;    2007
+#&gt; 5 Adelie  Torgersen     36.7     19.3         193      3450 female  2007
+#&gt; # ℹ 339 more rows
+```
+
+---
+
+# Caution with `group_by()` + `summarise()`
+
+With multiple groups, the summarise result **keeps part of the grouping and drops another part** .. a design flaw .. with a reminder given to you, as most users usually expect to drop all grouping after summaries
+
+
+``` r
+penguins|&gt;
+  group_by(species, island) |&gt; 
+  summarise(n = n())
+```
+
+```
+#&gt; `summarise()` has grouped output by 'species'. You can override using the `.groups` argument.
+```
+
+```
+#&gt; # A tibble: 5 × 3
+*#&gt; # Groups:   species [3]
+#&gt;   species   island        n
+#&gt;   &lt;fct&gt;     &lt;fct&gt;     &lt;int&gt;
+#&gt; 1 Adelie    Biscoe       44
+#&gt; 2 Adelie    Dream        56
+#&gt; 3 Adelie    Torgersen    52
+#&gt; 4 Chinstrap Dream        68
+#&gt; 5 Gentoo    Biscoe      124
+```
+
+---
+
+# Dropping all groups after `summarise()`
+
+We often want/need to drop any remaining groups after `summarise()`
+
+
+``` r
+penguins|&gt;
+  group_by(species, island) |&gt; 
+  summarise(n = n(),
+            .groups = 'drop')
+```
+
+```
+#&gt; # A tibble: 5 × 3
+#&gt;   species   island        n
+#&gt;   &lt;fct&gt;     &lt;fct&gt;     &lt;int&gt;
+#&gt; 1 Adelie    Biscoe       44
+#&gt; 2 Adelie    Dream        56
+#&gt; 3 Adelie    Torgersen    52
+#&gt; 4 Chinstrap Dream        68
+#&gt; 5 Gentoo    Biscoe      124
+```
+
+---
+
+# `mutate()` creating new columns
+
+`mutate()` adds a new column to the data.frame (or overwrites a current one) from the result of some operation (often with other columns in the data.frame)
+
+&lt;style type="text/css"&gt;
+.dplyr-mutate {
+position: absolute;
+top: 0%;
+right: 2%;
+width: 450px;
+}
+
+.dplyr-mutate &gt; p {
+ margin: 0;
+}
+&lt;/style&gt;
+
+.dplyr-mutate[
+![](images/mutate.png)&lt;!-- --&gt;
+]
+
+--
+
+Let's say you want to calculate: the ratio of sepal length to sepal width, or log petal length.
+
+
+
+
+
+``` r
+iris |&gt; 
+  mutate(
+    sepal_ratio = Sepal.Length / Sepal.Width,
+    log_Petal.Length = log(Petal.Length)
+  )
+```
+
+```
+#&gt; # A tibble: 150 × 7
+#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species sepal_ratio log_Petal.Length
+#&gt;          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;         &lt;dbl&gt;            &lt;dbl&gt;
+#&gt; 1          5.1         3.5          1.4         0.2 setosa         1.46            0.336
+#&gt; 2          4.9         3            1.4         0.2 setosa         1.63            0.336
+#&gt; 3          4.7         3.2          1.3         0.2 setosa         1.47            0.262
+#&gt; 4          4.6         3.1          1.5         0.2 setosa         1.48            0.405
+#&gt; 5          5           3.6          1.4         0.2 setosa         1.39            0.336
+#&gt; 6          5.4         3.9          1.7         0.4 setosa         1.38            0.531
+#&gt; 7          4.6         3.4          1.4         0.3 setosa         1.35            0.336
+#&gt; # ℹ 143 more rows
+```
+
+---
+
+# `mutate()` creating new columns
+
+.dplyr-mutate[
+![](images/mutate.png)&lt;!-- --&gt;
+]
+
+Or categorising values using `case_when` (also from **`dplyr`**)
+
+
+``` r
+penguins |&gt; 
+  mutate(
+    flipper_len_cat = case_when(
+      flipper_len &lt; 190 ~ "Short",
+      flipper_len &gt;= 190 &amp; flipper_len &lt; 210 ~ "Medium",
+      flipper_len &gt;= 210 ~ "Long"
+    )
+  )
+```
+
+```
+#&gt; # A tibble: 344 × 9
+#&gt;   species island    bill_len bill_dep flipper_len body_mass sex     year flipper_len_cat
+#&gt;   &lt;fct&gt;   &lt;fct&gt;        &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt;     &lt;int&gt; &lt;fct&gt;  &lt;int&gt; &lt;chr&gt;          
+#&gt; 1 Adelie  Torgersen     39.1     18.7         181      3750 male    2007 Short          
+#&gt; 2 Adelie  Torgersen     39.5     17.4         186      3800 female  2007 Short          
+#&gt; 3 Adelie  Torgersen     40.3     18           195      3250 female  2007 Medium         
+#&gt; 4 Adelie  Torgersen     NA       NA            NA        NA &lt;NA&gt;    2007 &lt;NA&gt;           
+#&gt; 5 Adelie  Torgersen     36.7     19.3         193      3450 female  2007 Medium         
+#&gt; 6 Adelie  Torgersen     39.3     20.6         190      3650 male    2007 Medium         
+#&gt; 7 Adelie  Torgersen     38.9     17.8         181      3625 female  2007 Short          
+#&gt; # ℹ 337 more rows
+```
+
+---
+
+# `mutate()` for data cleaning
+
+.dplyr-mutate[
+![](images/mutate.png)&lt;!-- --&gt;
+]
+
+In this data frame
+
+- There is a `"five"` in the age column and the current column type is character.
+- We replace `"five"` with `"5"` and then convert the column into the numeric data type
+
+
+
+
+``` r
+students
+```
+
+```
+#&gt; # A tibble: 6 × 5
+#&gt;   `Student ID` `Full Name`      favourite.food     mealPlan            AGE  
+#&gt;          &lt;dbl&gt; &lt;chr&gt;            &lt;chr&gt;              &lt;chr&gt;               &lt;chr&gt;
+#&gt; 1            1 Sunil Huffmann   Strawberry yoghurt Lunch only          4    
+#&gt; 2            2 Barclay Lynn     French fries       Lunch only          5    
+#&gt; 3            3 Jayendra Lyne    N/A                Breakfast and lunch 7    
+#&gt; 4            4 Leon Rossini     Anchovies          Lunch only          &lt;NA&gt; 
+#&gt; 5            5 Chidiegwu Dunkel Pizza              Breakfast and lunch five 
+#&gt; 6            6 Güvenç Attila    Ice cream          Lunch only          6
+```
+
+---
+
+# `mutate()` for data cleaning
+
+.dplyr-mutate[
+![](images/mutate.png)&lt;!-- --&gt;
+]
+
+
+
+``` r
+students |&gt; 
+  mutate(
+    #AGE = case_when(AGE == 'five' ~ '5', .default = AGE),
+    #AGE = as.numeric(AGE)
+    # --- AGE2 and AGE3 for demonstration ---
+    AGE2 = case_when(AGE == 'five' ~ '5', .default = AGE),
+    AGE3 = as.numeric(AGE2)
+  )
+```
+
+```
+#&gt; # A tibble: 6 × 7
+#&gt;   `Student ID` `Full Name`      favourite.food     mealPlan            AGE   AGE2   AGE3
+#&gt;          &lt;dbl&gt; &lt;chr&gt;            &lt;chr&gt;              &lt;chr&gt;               &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt;
+#&gt; 1            1 Sunil Huffmann   Strawberry yoghurt Lunch only          4     4         4
+#&gt; 2            2 Barclay Lynn     French fries       Lunch only          5     5         5
+#&gt; 3            3 Jayendra Lyne    N/A                Breakfast and lunch 7     7         7
+#&gt; 4            4 Leon Rossini     Anchovies          Lunch only          &lt;NA&gt;  &lt;NA&gt;     NA
+#&gt; 5            5 Chidiegwu Dunkel Pizza              Breakfast and lunch five  5         5
+#&gt; 6            6 Güvenç Attila    Ice cream          Lunch only          6     6         6
+```
+
+---
+  
+# `select()` pick or remove columns by name
+  
+`select()` is often used to pick required columns from larger datasets, or rearrange
+columns in a data.frame.
+
+--
+
+
+
+.pull-left[
+
+Select columns using names with without using quotes
+
+
+``` r
+iris |&gt;  
+  select(Species, Sepal.Length)
+```
+
+```
+#&gt; # A tibble: 150 × 2
+#&gt;    Species Sepal.Length
+#&gt;    &lt;fct&gt;          &lt;dbl&gt;
+#&gt;  1 setosa           5.1
+#&gt;  2 setosa           4.9
+#&gt;  3 setosa           4.7
+#&gt;  4 setosa           4.6
+#&gt;  5 setosa           5  
+#&gt;  6 setosa           5.4
+#&gt;  7 setosa           4.6
+#&gt;  8 setosa           5  
+#&gt;  9 setosa           4.4
+#&gt; 10 setosa           4.9
+#&gt; 11 setosa           5.4
+#&gt; 12 setosa           4.8
+#&gt; # ℹ 138 more rows
+```
+]
+
+--
+
+.pull-right[
+
+Remove columns using `-`
+  
+
+``` r
+iris |&gt;  
+  select(-Sepal.Length, -Sepal.Width)
+```
+
+```
+#&gt; # A tibble: 150 × 3
+#&gt;    Petal.Length Petal.Width Species
+#&gt;           &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;  
+#&gt;  1          1.4         0.2 setosa 
+#&gt;  2          1.4         0.2 setosa 
+#&gt;  3          1.3         0.2 setosa 
+#&gt;  4          1.5         0.2 setosa 
+#&gt;  5          1.4         0.2 setosa 
+#&gt;  6          1.7         0.4 setosa 
+#&gt;  7          1.4         0.3 setosa 
+#&gt;  8          1.5         0.2 setosa 
+#&gt;  9          1.4         0.2 setosa 
+#&gt; 10          1.5         0.1 setosa 
+#&gt; 11          1.5         0.2 setosa 
+#&gt; 12          1.6         0.2 setosa 
+#&gt; # ℹ 138 more rows
+```
+]
+
+---
+  
+# `select()` pick or remove columns by name
+  
+`select()` is often used to pick required columns from larger datasets, or rearrange
+columns in a data.frame.
+
+
+Select **all columns between** Sepal.Length and Petal.Width (inclusive):
+  
+
+``` r
+# Sepal.Length, Sepal.Width, Petal.Length, Petal.Width
+iris |&gt; 
+  select(Sepal.Length:Petal.Width)
+```
+
+```
+#&gt; # A tibble: 150 × 4
+#&gt;    Sepal.Length Sepal.Width Petal.Length Petal.Width
+#&gt;           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;
+#&gt;  1          5.1         3.5          1.4         0.2
+#&gt;  2          4.9         3            1.4         0.2
+#&gt;  3          4.7         3.2          1.3         0.2
+#&gt;  4          4.6         3.1          1.5         0.2
+#&gt;  5          5           3.6          1.4         0.2
+#&gt;  6          5.4         3.9          1.7         0.4
+#&gt;  7          4.6         3.4          1.4         0.3
+#&gt;  8          5           3.4          1.5         0.2
+#&gt;  9          4.4         2.9          1.4         0.2
+#&gt; 10          4.9         3.1          1.5         0.1
+#&gt; 11          5.4         3.7          1.5         0.2
+#&gt; 12          4.8         3.4          1.6         0.2
+#&gt; # ℹ 138 more rows
+```
+
+
+---
+  
+# `select()` helper functions
+  
+In very large datasets, there may be repeating elements in columns names
+
+
+
+
+``` r
+select_example_df
+```
+
+```
+#&gt;   PatientID Code_a Code_b Code_c Code_d Code_e Name1 Name2 Name3 Name4 Name5
+#&gt; 1         1    ...    ...    ...    ...    ...   ...   ...   ...   ...   ...
+#&gt; 2         2    ...    ...    ...    ...    ...   ...   ...   ...   ...   ...
+#&gt; 3         3    ...    ...    ...    ...    ...   ...   ...   ...   ...   ...
+```
+
+--
+  
+**`dplyr`** has `select()` helper functions:
+  
+- `starts_with("abc")`: matches names that begin with “abc”.
+- `ends_with("xyz")`: matches names that end with “xyz”.
+- `contains("ijk")`: matches names that contain “ijk”.
+- `num_range("x", 1:3)`: matches x1, x2 and x3.
+
+--
+
+
+``` r
+select_example_df |&gt; 
+  select(PatientID, starts_with("Code"))
+```
+
+```
+#&gt;   PatientID Code_a Code_b Code_c Code_d Code_e
+#&gt; 1         1    ...    ...    ...    ...    ...
+#&gt; 2         2    ...    ...    ...    ...    ...
+#&gt; 3         3    ...    ...    ...    ...    ...
+```
+
+---
+
+# `filter()` subsets rows
+
+&lt;style type="text/css"&gt;
+.dplyr-filter {
+position: absolute;
+top: 0%;
+right: 2%;
+width: 500px;
+}
+&lt;/style&gt;
+
+.dplyr-filter[
+![](images/filter.png)&lt;!-- --&gt;
+]
+
+We use `filter()` to obtain a subset of the initial data.frame
+
+--
+
+It uses conditional selection on columns within the input data.frame
+
+
+ 
+
+``` r
+iris |&gt; 
+  filter(Sepal.Length &gt; 7)
+```
+
+--
+
+
+```
+#&gt; # A tibble: 12 × 5
+#&gt;    Sepal.Length Sepal.Width Petal.Length Petal.Width Species  
+#&gt;           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;    
+#&gt;  1          7.1         3            5.9         2.1 virginica
+#&gt;  2          7.6         3            6.6         2.1 virginica
+#&gt;  3          7.3         2.9          6.3         1.8 virginica
+#&gt;  4          7.2         3.6          6.1         2.5 virginica
+#&gt;  5          7.7         3.8          6.7         2.2 virginica
+#&gt;  6          7.7         2.6          6.9         2.3 virginica
+#&gt;  7          7.7         2.8          6.7         2   virginica
+#&gt;  8          7.2         3.2          6           1.8 virginica
+#&gt;  9          7.2         3            5.8         1.6 virginica
+#&gt; 10          7.4         2.8          6.1         1.9 virginica
+#&gt; 11          7.9         3.8          6.4         2   virginica
+#&gt; 12          7.7         3            6.1         2.3 virginica
+```
+
+---
+
+# `filter()` subsets rows
+
+.dplyr-filter[
+![](images/filter.png)&lt;!-- --&gt;
+]
+
+
+
+
+``` r
+penguins |&gt; 
+  filter(species == "Chinstrap")
+```
+
+--
+
+
+```
+#&gt; # A tibble: 68 × 8
+#&gt;    species   island bill_len bill_dep flipper_len body_mass sex     year
+#&gt;    &lt;fct&gt;     &lt;fct&gt;     &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt;     &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+#&gt;  1 Chinstrap Dream      46.5     17.9         192      3500 female  2007
+#&gt;  2 Chinstrap Dream      50       19.5         196      3900 male    2007
+#&gt;  3 Chinstrap Dream      51.3     19.2         193      3650 male    2007
+#&gt;  4 Chinstrap Dream      45.4     18.7         188      3525 female  2007
+#&gt;  5 Chinstrap Dream      52.7     19.8         197      3725 male    2007
+#&gt;  6 Chinstrap Dream      45.2     17.8         198      3950 female  2007
+#&gt;  7 Chinstrap Dream      46.1     18.2         178      3250 female  2007
+#&gt;  8 Chinstrap Dream      51.3     18.2         197      3750 male    2007
+#&gt;  9 Chinstrap Dream      46       18.9         195      4150 female  2007
+#&gt; 10 Chinstrap Dream      51.3     19.9         198      3700 male    2007
+#&gt; 11 Chinstrap Dream      46.6     17.8         193      3800 female  2007
+#&gt; 12 Chinstrap Dream      51.7     20.3         194      3775 male    2007
+#&gt; 13 Chinstrap Dream      47       17.3         185      3700 female  2007
+#&gt; 14 Chinstrap Dream      52       18.1         201      4050 male    2007
+#&gt; 15 Chinstrap Dream      45.9     17.1         190      3575 female  2007
+#&gt; # ℹ 53 more rows
+```
+
+---
+
+# `filter()` more examples
+
+.dplyr-filter[
+![](images/filter.png)&lt;!-- --&gt;
+]
+
+Combining conditional selections
+
+
+``` r
+# Flowers with Sepal.Length &gt; 5 cm &amp; Sepal.Width &gt; 3 cm
+iris |&gt; 
+  filter(Sepal.Length &gt; 5 &amp; Sepal.Width &gt; 3)
+```
+--
+
+``` r
+# Flowers from only species "setosa" or "virginica"
+iris |&gt; 
+  filter(Species == "setosa" | Species == "virginica")
+```
+--
+
+``` r
+# Flowers from only species "setosa" or "virginica" using %in%
+iris |&gt; 
+  filter(Species %in% c("setosa", "virginica"))
+```
+--
+
+``` r
+# Removing "setosa" flowers
+iris |&gt; 
+  filter(Species != "setosa")
+```
+
+--
+
+ Note: column names without quotes `Species` and values wanted with quotes `"setosa"`
+ 
+---
+
+# `arrange()` arrange and sort rows
+
+We `arrange()` data because it helps with readability and reporting, facilitates 
+analysis and can be a foundation for subsequent operations e.g. sort by date and calculate cumulative total
+
+--
+
+`arrange()` works on one, or multiple, columns in the input data.frame .. selected without quotes
+
+
+``` r
+iris |&gt;  
+  arrange(Sepal.Length, Sepal.Width)
+```
+
+--
+
+
+
+
+```
+#&gt; # A tibble: 150 × 5
+#&gt;    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+#&gt;           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;  
+#&gt;  1          4.3         3            1.1         0.1 setosa 
+#&gt;  2          4.4         2.9          1.4         0.2 setosa 
+#&gt;  3          4.4         3            1.3         0.2 setosa 
+#&gt;  4          4.4         3.2          1.3         0.2 setosa 
+#&gt;  5          4.5         2.3          1.3         0.3 setosa 
+#&gt;  6          4.6         3.1          1.5         0.2 setosa 
+#&gt;  7          4.6         3.2          1.4         0.2 setosa 
+#&gt;  8          4.6         3.4          1.4         0.3 setosa 
+#&gt;  9          4.6         3.6          1           0.2 setosa 
+#&gt; 10          4.7         3.2          1.3         0.2 setosa 
+#&gt; 11          4.7         3.2          1.6         0.2 setosa 
+#&gt; 12          4.8         3            1.4         0.1 setosa 
+#&gt; # ℹ 138 more rows
+```
+
+---
+
+# `arrange()` arrange and sort rows
+
+Default is in ascending order, use `desc()` on the column for descending
+
+
+``` r
+iris |&gt;  
+  arrange(desc(Sepal.Length), Sepal.Width)
+```
+
+--
+
+
+```
+#&gt; # A tibble: 150 × 5
+#&gt;    Sepal.Length Sepal.Width Petal.Length Petal.Width Species  
+#&gt;           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;    
+#&gt;  1          7.9         3.8          6.4         2   virginica
+#&gt;  2          7.7         2.6          6.9         2.3 virginica
+#&gt;  3          7.7         2.8          6.7         2   virginica
+#&gt;  4          7.7         3            6.1         2.3 virginica
+#&gt;  5          7.7         3.8          6.7         2.2 virginica
+#&gt;  6          7.6         3            6.6         2.1 virginica
+#&gt;  7          7.4         2.8          6.1         1.9 virginica
+#&gt;  8          7.3         2.9          6.3         1.8 virginica
+#&gt;  9          7.2         3            5.8         1.6 virginica
+#&gt; 10          7.2         3.2          6           1.8 virginica
+#&gt; 11          7.2         3.6          6.1         2.5 virginica
+#&gt; 12          7.1         3            5.9         2.1 virginica
+#&gt; # ℹ 138 more rows
+```
+
+
+---
+
+# Chaining functions together
+
+The power of **`dplyr`** and `|&gt;` lies in the ability to chain multiple functions
+together
+
+
+``` r
+penguins |&gt; 
+  filter(species == 'Adelie' &amp; !is.na(sex)) |&gt; 
+  mutate(bill_area_mm2 = bill_len * bill_dep) |&gt; 
+  group_by(species, year, sex) |&gt; 
+  summarise(
+    n = n(),
+    mean_bill_area_mm2 = mean(bill_area_mm2),
+    sd_bill_area_mm2 = sd(bill_area_mm2),
+    se_bill_area_mm2 = sd_bill_area_mm2 / sqrt(n),
+    .groups = 'drop'
+  ) |&gt; 
+  arrange(desc(year), sex)
+```
+
+```
+#&gt; # A tibble: 6 × 7
+#&gt;   species  year sex        n mean_bill_area_mm2 sd_bill_area_mm2 se_bill_area_mm2
+#&gt;   &lt;fct&gt;   &lt;int&gt; &lt;fct&gt;  &lt;int&gt;              &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+#&gt; 1 Adelie   2009 female    26               650.             57.8            11.3 
+#&gt; 2 Adelie   2009 male      26               764.             53.6            10.5 
+#&gt; 3 Adelie   2008 female    25               638.             49.0             9.81
+#&gt; 4 Adelie   2008 male      25               768.             48.2             9.65
+#&gt; 5 Adelie   2007 female    22               687.             40.8             8.69
+#&gt; 6 Adelie   2007 male      22               780.             77.4            16.5
+```
+
+---
+
+
+# Other uses and dplyr functions
+
+There are many other uses to the functions just described
+
+There are also other commonly used **`dplyr`** functions that we did not cover
+
+ - `slice()`
+ - `distinct()`
+ - `rename()`
+ - `across()`
+ - and more!
+ 
+Check out the dplyr [webpage](https://dplyr.tidyverse.org/index.html)
+ - [Vignettes](https://dplyr.tidyverse.org/articles/index.html)
+ - [Fuction reference](https://dplyr.tidyverse.org/reference/index.html)  
+
+
+
+
+---
+
+class: center, middle, inverse
+
+# Exercise time!
+
+.section-subtitle[
+  
+Open the file
+  
+.inverse[`M02-02-dplyr.R`]
+  
+and attempt the exercises.
+  
+  
+]
+
+
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: middle
+
+# Joining datasets
+
+---
+
+# Joining datasets with **`dplyr`**
+
+We often have data from multiple sources and need to join them together to answer our 
+research questions
+
+.pull-left[
+- What was the weather like at the different sites on the sample dates?
+
+- What is the full taxonomic lineage of the organisms used in my experiment?
+
+- I need the geographic coordinates (lat/lon) for sample locations to create a map.
+
+- And any others ...
+
+]
+
+--
+
+.pull-right[
+
+**`dplyr`** joining functions
+
+&lt;img src="images/join.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+
+# `left_join()` ... the most common join
+
+The primary use of `left_join()` is to **add additional metadata** to a **primary dataset**
+
+For example
+
+- Combing primary animal survey data with site geographic coordinates for a map visualisation
+
+
+
+--
+
+
+
+.pull-left[
+
+
+``` r
+animal_counts
+```
+
+```
+#&gt; # A tibble: 9 × 4
+#&gt;   site_id date       observer animal_count
+#&gt;   &lt;chr&gt;   &lt;date&gt;     &lt;chr&gt;           &lt;int&gt;
+#&gt; 1 SiteC   2024-01-04 Charlie            10
+#&gt; 2 SiteA   2024-01-06 Alice               6
+#&gt; 3 SiteB   2024-01-12 Bob                 1
+#&gt; 4 SiteA   2024-01-13 Charlie            10
+#&gt; 5 SiteA   2024-01-16 Charlie             2
+#&gt; 6 SiteC   2024-01-18 Alice               5
+#&gt; 7 SiteB   2024-01-22 Alice               9
+#&gt; 8 SiteC   2024-01-29 Alice               7
+#&gt; 9 SiteB   2024-01-30 Alice               2
+```
+
+]
+
+--
+
+.pull-right[
+
+
+
+``` r
+site_coordinates
+```
+
+```
+#&gt; # A tibble: 3 × 3
+#&gt;   site_id   lat   lon
+#&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1 SiteA    40.3 -3.69
+#&gt; 2 SiteB    40.4 -3.75
+#&gt; 3 SiteC    40.5 -3.81
+```
+
+]
+
+---
+
+# Joining requires a key
+
+The **columns in each dataset** that has **values to match** on
+
+ - the values must match exactly for a join to occur
+
+--
+
+In our example, `site_id` was present in both datasets
+
+- join matching rows from `site_coordinates` to `animal_counts` by `site_id` values 
+
+
+
+
+``` r
+animal_counts |&gt; 
+  left_join(site_coordinates, by = 'site_id')
+```
+
+--
+
+
+```
+#&gt; # A tibble: 9 × 6
+#&gt;   site_id date       observer animal_count   lat   lon
+#&gt;   &lt;chr&gt;   &lt;date&gt;     &lt;chr&gt;           &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1 SiteC   2024-01-04 Charlie            10  40.5 -3.81
+#&gt; 2 SiteA   2024-01-06 Alice               6  40.3 -3.69
+#&gt; 3 SiteB   2024-01-12 Bob                 1  40.4 -3.75
+#&gt; 4 SiteA   2024-01-13 Charlie            10  40.3 -3.69
+#&gt; 5 SiteA   2024-01-16 Charlie             2  40.3 -3.69
+#&gt; 6 SiteC   2024-01-18 Alice               5  40.5 -3.81
+#&gt; 7 SiteB   2024-01-22 Alice               9  40.4 -3.75
+#&gt; 8 SiteC   2024-01-29 Alice               7  40.5 -3.81
+#&gt; 9 SiteB   2024-01-30 Alice               2  40.4 -3.75
+```
+
+---
+
+# Joining requires a key
+
+If the column names differ between the data, but you know those contain the keys
+
+ - use `by = c(column_in_a = column_in_b)`
+
+
+``` r
+animal_counts |&gt;
+  # rename site_id to location_id
+  rename(location_id = site_id) |&gt; 
+  left_join(site_coordinates, by = c('location_id' = 'site_id'))
+```
+
+--
+
+
+```
+#&gt; # A tibble: 9 × 6
+#&gt;   location_id date       observer animal_count   lat   lon
+#&gt;   &lt;chr&gt;       &lt;date&gt;     &lt;chr&gt;           &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1 SiteC       2024-01-04 Charlie            10  40.5 -3.81
+#&gt; 2 SiteA       2024-01-06 Alice               6  40.3 -3.69
+#&gt; 3 SiteB       2024-01-12 Bob                 1  40.4 -3.75
+#&gt; 4 SiteA       2024-01-13 Charlie            10  40.3 -3.69
+#&gt; 5 SiteA       2024-01-16 Charlie             2  40.3 -3.69
+#&gt; 6 SiteC       2024-01-18 Alice               5  40.5 -3.81
+#&gt; 7 SiteB       2024-01-22 Alice               9  40.4 -3.75
+#&gt; 8 SiteC       2024-01-29 Alice               7  40.5 -3.81
+#&gt; 9 SiteB       2024-01-30 Alice               2  40.4 -3.75
+```
+
+---
+
+# Multiple keys
+
+Sometimes we need to use multiple columns to join
+
+Example
+
+- joining environmental data by date **and** location
+
+--
+
+
+
+
+.pull-left[
+
+
+``` r
+animal_counts
+```
+
+```
+#&gt; # A tibble: 9 × 4
+#&gt;   site_id date       observer animal_count
+#&gt;   &lt;chr&gt;   &lt;date&gt;     &lt;chr&gt;           &lt;int&gt;
+#&gt; 1 SiteC   2024-01-04 Charlie            10
+#&gt; 2 SiteA   2024-01-06 Alice               6
+#&gt; 3 SiteB   2024-01-12 Bob                 1
+#&gt; 4 SiteA   2024-01-13 Charlie            10
+#&gt; 5 SiteA   2024-01-16 Charlie             2
+#&gt; 6 SiteC   2024-01-18 Alice               5
+#&gt; 7 SiteB   2024-01-22 Alice               9
+#&gt; 8 SiteC   2024-01-29 Alice               7
+#&gt; 9 SiteB   2024-01-30 Alice               2
+```
+
+]
+
+--
+
+.pull-right[
+
+
+
+``` r
+environmental_data
+```
+
+```
+#&gt; # A tibble: 94 × 4
+#&gt;    site_id date       temp_c rain_mm
+#&gt;    &lt;chr&gt;   &lt;date&gt;      &lt;dbl&gt;   &lt;dbl&gt;
+#&gt;  1 SiteA   2024-01-01   -1.6     7.2
+#&gt;  2 SiteA   2024-01-02    7.7     0.5
+#&gt;  3 SiteA   2024-01-03   -1.7    17  
+#&gt;  4 SiteA   2024-01-04    1.3    14.3
+#&gt;  5 SiteA   2024-01-05    5.7     2.6
+#&gt;  6 SiteA   2024-01-06    3       6.6
+#&gt;  7 SiteA   2024-01-07   10.3     3.1
+#&gt;  8 SiteA   2024-01-08    7       4.4
+#&gt;  9 SiteA   2024-01-09   -1.7     9.1
+#&gt; 10 SiteA   2024-01-10    2.7    10  
+#&gt; # ℹ 84 more rows
+```
+
+]
+
+---
+
+# Joining with multiple keys
+
+
+``` r
+animal_counts %&gt;% 
+  left_join(environmental_data, by = c('site_id', 'date'))
+```
+
+--
+
+
+```
+#&gt; # A tibble: 9 × 6
+#&gt;   site_id date       observer animal_count temp_c rain_mm
+#&gt;   &lt;chr&gt;   &lt;date&gt;     &lt;chr&gt;           &lt;int&gt;  &lt;dbl&gt;   &lt;dbl&gt;
+#&gt; 1 SiteC   2024-01-04 Charlie            10   -0.3     4.6
+#&gt; 2 SiteA   2024-01-06 Alice               6    3       6.6
+#&gt; 3 SiteB   2024-01-12 Bob                 1   -1.8    17.3
+#&gt; 4 SiteA   2024-01-13 Charlie            10   -0.1     6.4
+#&gt; 5 SiteA   2024-01-16 Charlie             2   13.2     4.5
+#&gt; 6 SiteC   2024-01-18 Alice               5    5.8     9  
+#&gt; 7 SiteB   2024-01-22 Alice               9   -0.1    14.6
+#&gt; 8 SiteC   2024-01-29 Alice               7    2.2    18.5
+#&gt; 9 SiteB   2024-01-30 Alice               2    7.6     4.4
+```
+
+---
+
+# Multiple key values will duplicate rows
+
+Here, there are 2 rows for person A 
+
+
+
+.pull-left[
+
+
+``` r
+persons
+```
+
+```
+#&gt;   person
+#&gt; 1      A
+#&gt; 2      B
+#&gt; 3      C
+#&gt; 4      D
+#&gt; 5      E
+```
+
+]
+
+.pull-right[
+
+
+``` r
+ages
+```
+
+```
+#&gt;   person age
+*#&gt; 1      A  10
+*#&gt; 2      A  15
+#&gt; 3      B  12
+#&gt; 4      C  11
+#&gt; 5      D  14
+```
+
+]
+
+--
+
+
+``` r
+persons %&gt;% 
+  left_join(ages, by = 'person')
+```
+
+
+```
+#&gt;   person age
+*#&gt; 1      A  10
+*#&gt; 2      A  15
+#&gt; 3      B  12
+#&gt; 4      C  11
+#&gt; 5      D  14
+#&gt; 6      E  NA
+```
+
+---
+
+# Check your data before joining
+
+It is good practice to verify your joining columns and their values (keys) 
+
+--
+
+.pull-left[
+
+- Do values uniquely identify an observation? 
+
+
+
+
+
+``` r
+# sort = TRUE, sort result by decending n
+environmental_data %&gt;% 
+  count(site_id, date, sort = TRUE)
+```
+
+```
+#&gt; # A tibble: 93 × 3
+#&gt;   site_id date           n
+#&gt;   &lt;chr&gt;   &lt;date&gt;     &lt;int&gt;
+*#&gt; 1 SiteC   2024-01-31     2
+#&gt; 2 SiteA   2024-01-01     1
+#&gt; 3 SiteA   2024-01-02     1
+#&gt; 4 SiteA   2024-01-03     1
+#&gt; 5 SiteA   2024-01-04     1
+#&gt; 6 SiteA   2024-01-05     1
+#&gt; 7 SiteA   2024-01-06     1
+#&gt; # ℹ 86 more rows
+```
+
+]
+
+--
+
+.pull-right[
+
+- There are two values for `SiteC` and `2024-01-31`
+
+
+``` r
+environmental_data %&gt;% 
+  dplyr::filter(site_id == 'SiteC', 
+                date == '2024-01-31')
+```
+
+```
+#&gt; # A tibble: 2 × 4
+#&gt;   site_id date       temp_c rain_mm
+#&gt;   &lt;chr&gt;   &lt;date&gt;      &lt;dbl&gt;   &lt;dbl&gt;
+#&gt; 1 SiteC   2024-01-31    8.9    14.5
+#&gt; 2 SiteC   2024-01-31   11       1
+```
+
+&lt;br&gt;
+
+This did not affect our join: no animal counts were conducted on this date ...
+
+]
+
+---
+
+# Other joins - `inner_join()` and `full_join()`
+
+
+
+.pull-left[
+
+
+``` r
+persons
+```
+
+```
+#&gt;   person age
+#&gt; 1      A  32
+#&gt; 2      B  29
+#&gt; 3      C  37
+#&gt; 4      E  40
+```
+
+]
+
+.pull-right[
+
+
+``` r
+persons_paid
+```
+
+```
+#&gt;   person amount
+#&gt; 1      A     $5
+#&gt; 2      B    $10
+#&gt; 3      C     $8
+#&gt; 4      D     $4
+```
+
+]
+
+--
+
+.pull-left[
+
+**Inner join** - only where key in both datasets
+
+
+``` r
+persons %&gt;% 
+  inner_join(persons_paid, by = 'person')
+```
+
+```
+#&gt;   person age amount
+#&gt; 1      A  32     $5
+#&gt; 2      B  29    $10
+#&gt; 3      C  37     $8
+```
+]
+
+--
+
+.pull-right[
+
+**Full join** - keys in all datasets
+
+
+``` r
+persons %&gt;% 
+  full_join(persons_paid, by = 'person')
+```
+
+```
+#&gt;   person age amount
+#&gt; 1      A  32     $5
+#&gt; 2      B  29    $10
+#&gt; 3      C  37     $8
+#&gt; 4      E  40   &lt;NA&gt;
+#&gt; 5      D  NA     $4
+```
+]
+
+---
+
+class: center, middle, inverse
+
+
+# Exercise time!
+
+.section-subtitle[
+
+Open the file
+
+.inverse[`M02-02-dplyr-joins.R`]
+
+and attempt the exercises.
+
+
+
+]
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: middle
+
+# Reshaping data
+
+---
+
+# Data can come in two structures
+
+
+
+
+--
+
+.pull-left[
+
+.large[Wide]
+
+
+``` r
+gene_data
+```
+
+```
+#&gt; # A tibble: 6 × 7
+#&gt;   Trt     Rep Gene1 Gene2 Gene3 Gene4 Gene5
+#&gt;   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#&gt; 1 A         1     9    12     4    11    12
+#&gt; 2 A         2     8    15     4     9    14
+#&gt; 3 A         3     4     6     6    11    10
+#&gt; 4 B         1     6     7     6    15    15
+#&gt; 5 B         2     5    10     8     8     6
+#&gt; 6 B         3     3     6     6     7    10
+```
+
+]
+
+--
+
+.pull-right[
+
+.large[Long]
+
+
+
+
+``` r
+gene_data_long
+```
+
+```
+#&gt; # A tibble: 30 × 4
+#&gt;    Trt     Rep Gene  Count
+#&gt;    &lt;chr&gt; &lt;int&gt; &lt;chr&gt; &lt;int&gt;
+#&gt;  1 A         1 Gene1     9
+#&gt;  2 A         1 Gene2    12
+#&gt;  3 A         1 Gene3     4
+#&gt;  4 A         1 Gene4    11
+#&gt;  5 A         1 Gene5    12
+#&gt;  6 A         2 Gene1     8
+#&gt;  7 A         2 Gene2    15
+#&gt;  8 A         2 Gene3     4
+#&gt;  9 A         2 Gene4     9
+#&gt; 10 A         2 Gene5    14
+#&gt; 11 A         3 Gene1     4
+#&gt; 12 A         3 Gene2     6
+#&gt; 13 A         3 Gene3     6
+#&gt; 14 A         3 Gene4    11
+#&gt; 15 A         3 Gene5    10
+#&gt; # ℹ 15 more rows
+```
+
+]
+
+---
+
+# Certain tasks require data in the correct structure
+
+How could you `summarise()` the mean of each `Gene` column by the `Trt` column??
+
+
+``` r
+gene_data
+```
+
+```
+#&gt; # A tibble: 6 × 7
+#&gt;   Trt     Rep Gene1 Gene2 Gene3 Gene4 Gene5
+#&gt;   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#&gt; 1 A         1     9    12     4    11    12
+#&gt; 2 A         2     8    15     4     9    14
+#&gt; 3 A         3     4     6     6    11    10
+#&gt; 4 B         1     6     7     6    15    15
+#&gt; 5 B         2     5    10     8     8     6
+#&gt; 6 B         3     3     6     6     7    10
+```
+
+--
+
+From what we have learned ...
+
+
+``` r
+gene_data |&gt;
+  group_by(Trt, Gene) |&gt;# ???
+  summarise(mean_count = mean(???)) #???
+```
+
+--
+
+We need to **restructure** our data for this ...
+
+---
+
+# The **`tidyr`** package has data reshaping tools
+
+The goal of tidyr is to help you create **tidy data**. ... you’ll spend less time fighting with the tools and more time working on your analysis
+
+Part of the core tidyverse
+
+
+``` r
+# readr is loaded with
+library(tidyverse)
+# individually
+library(tidyr)
+```
+
+.footnote[
+https://tidyr.tidyverse.org/
+]
+
+
+--
+
+The term used by **`tidyr`** to reshape wide and long data is called **pivoting**
+
+---
+
+#`pivot_longer()` reshape from wide to long
+
+- `cols = ` which columns to "pivot" .. can use selector functions
+- `names_to = ` the new column name that pivoted columns **names** go  .. as a string 
+- `values_to =` the new column name that the pivoted columns **values** go  .. as a string
+
+.pull-left[
+
+
+``` r
+gene_data
+```
+
+```
+#&gt; # A tibble: 6 × 7
+#&gt;   Trt     Rep Gene1 Gene2 Gene3 Gene4 Gene5
+#&gt;   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#&gt; 1 A         1     9    12     4    11    12
+#&gt; 2 A         2     8    15     4     9    14
+#&gt; 3 A         3     4     6     6    11    10
+#&gt; 4 B         1     6     7     6    15    15
+#&gt; 5 B         2     5    10     8     8     6
+#&gt; 6 B         3     3     6     6     7    10
+```
+
+]
+
+.pull-right[
+
+
+
+
+``` r
+gene_data |&gt;
+  pivot_longer(cols = starts_with('Gene'), 
+               names_to = 'Gene', 
+               values_to = 'Count')
+```
+
+```
+#&gt; # A tibble: 30 × 4
+#&gt;   Trt     Rep Gene  Count
+#&gt;   &lt;chr&gt; &lt;int&gt; &lt;chr&gt; &lt;int&gt;
+#&gt; 1 A         1 Gene1     9
+#&gt; 2 A         1 Gene2    12
+#&gt; 3 A         1 Gene3     4
+#&gt; 4 A         1 Gene4    11
+#&gt; 5 A         1 Gene5    12
+#&gt; 6 A         2 Gene1     8
+#&gt; 7 A         2 Gene2    15
+#&gt; 8 A         2 Gene3     4
+#&gt; # ℹ 22 more rows
+```
+
+]
+
+.footnote[
+Note that the `names_to =` and `values_to =` take strings as input `'Gene'` and `'Count'`, not `Gene` or `Count` ..
+]
+
+---
+
+# Now we can summarise() by `Trt` and `Gene`
+
+.pull-left[
+
+``` r
+gene_data |&gt;
+  pivot_longer(cols = starts_with('Gene'), 
+               names_to = 'Gene', 
+               values_to = 'Count') |&gt;
+  group_by(Trt, Gene) |&gt;
+  summarise(mean_Count = mean(Count),
+            .groups = 'drop')
+```
+
+```
+#&gt; # A tibble: 10 × 3
+#&gt;    Trt   Gene  mean_Count
+#&gt;    &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;
+#&gt;  1 A     Gene1       7   
+#&gt;  2 A     Gene2      11   
+#&gt;  3 A     Gene3       4.67
+#&gt;  4 A     Gene4      10.3 
+#&gt;  5 A     Gene5      12   
+#&gt;  6 B     Gene1       4.67
+#&gt;  7 B     Gene2       7.67
+#&gt;  8 B     Gene3       6.67
+#&gt;  9 B     Gene4      10   
+#&gt; 10 B     Gene5      10.3
+```
+]
+
+--
+
+.pull-right[
+
+It may be wise to create an object of the long data, if needed for other tasks
+
+
+
+``` r
+gene_data_long &lt;-
+  gene_data |&gt;
+  pivot_longer(cols = starts_with('Gene'), 
+               names_to = 'Gene', 
+               values_to = 'Count')
+
+gene_data_long |&gt; 
+  group_by(Trt, Gene) |&gt;
+  summarise(mean_Count = mean(Count),
+            .groups = 'drop')
+```
+]
+
+---
+
+# `pivot_wider()` reshape long to wide
+
+ - `names_from =` the column(s) with values that become the new column names, and 
+ - `values_to =` the column with values that populate the new columns
+
+.pull-left[
+
+
+
+
+``` r
+gene_data_long
+```
+
+```
+#&gt; # A tibble: 30 × 4
+#&gt;    Trt     Rep Gene  Count
+#&gt;    &lt;chr&gt; &lt;int&gt; &lt;chr&gt; &lt;int&gt;
+#&gt;  1 A         1 Gene1     9
+#&gt;  2 A         1 Gene2    12
+#&gt;  3 A         1 Gene3     4
+#&gt;  4 A         1 Gene4    11
+#&gt;  5 A         1 Gene5    12
+#&gt;  6 A         2 Gene1     8
+#&gt;  7 A         2 Gene2    15
+#&gt;  8 A         2 Gene3     4
+#&gt;  9 A         2 Gene4     9
+#&gt; 10 A         2 Gene5    14
+#&gt; 11 A         3 Gene1     4
+#&gt; 12 A         3 Gene2     6
+#&gt; # ℹ 18 more rows
+```
+
+]
+
+--
+
+.pull-right[
+
+``` r
+gene_data_long |&gt;
+  pivot_wider(names_from = 'Gene', 
+              values_from = 'Count')
+```
+
+```
+#&gt; # A tibble: 6 × 7
+#&gt;   Trt     Rep Gene1 Gene2 Gene3 Gene4 Gene5
+#&gt;   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#&gt; 1 A         1     9    12     4    11    12
+#&gt; 2 A         2     8    15     4     9    14
+#&gt; 3 A         3     4     6     6    11    10
+#&gt; 4 B         1     6     7     6    15    15
+#&gt; 5 B         2     5    10     8     8     6
+#&gt; 6 B         3     3     6     6     7    10
+```
+]
+
+---
+
+# Pivoting with missing combinations
+
+Produce `NA` by default
+
+
+
+.pull-left[
+
+Here, A_1_Gene1, A_2_Gene3 have no rows
+
+
+``` r
+gene_data_long
+```
+
+```
+#&gt; # A tibble: 28 × 4
+#&gt;    Trt     Rep Gene  Count
+#&gt;    &lt;chr&gt; &lt;int&gt; &lt;chr&gt; &lt;int&gt;
+*#&gt;  1 A         1 Gene2    12
+#&gt;  2 A         1 Gene3     4
+#&gt;  3 A         1 Gene4    11
+#&gt;  4 A         1 Gene5    12
+#&gt;  5 A         2 Gene1     8
+#&gt;  6 A         2 Gene2    15
+*#&gt;  7 A         2 Gene4     9
+#&gt;  8 A         2 Gene5    14
+#&gt;  9 A         3 Gene1     4
+#&gt; 10 A         3 Gene2     6
+#&gt; 11 A         3 Gene3     6
+#&gt; 12 A         3 Gene4    11
+#&gt; # ℹ 16 more rows
+```
+
+]
+
+--
+
+.pull-right[
+
+``` r
+gene_data_long |&gt;
+  pivot_wider(names_from = 'Gene', 
+              values_from = 'Count')
+```
+
+```
+#&gt; # A tibble: 6 × 7
+#&gt;   Trt     Rep Gene2 Gene3 Gene4 Gene5 Gene1
+#&gt;   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+*#&gt; 1 A         1    12     4    11    12    NA
+*#&gt; 2 A         2    15    NA     9    14     8
+#&gt; 3 A         3     6     6    11    10     4
+#&gt; 4 B         1     7     6    15    15     6
+#&gt; 5 B         2    10     8     8     6     5
+#&gt; 6 B         3     6     6     7    10     3
+```
+]
+
+---
+
+# Filling missing values after pivot 
+
+Can choose a value for missing with `values_fill`
+
+
+``` r
+gene_data_long |&gt;
+  pivot_wider(names_from = 'Gene', 
+              values_from = 'Count', 
+*             values_fill = 0)
+```
+
+```
+#&gt; # A tibble: 6 × 7
+#&gt;   Trt     Rep Gene2 Gene3 Gene4 Gene5 Gene1
+#&gt;   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+*#&gt; 1 A         1    12     4    11    12     0
+*#&gt; 2 A         2    15     0     9    14     8
+#&gt; 3 A         3     6     6    11    10     4
+#&gt; 4 B         1     7     6    15    15     6
+#&gt; 5 B         2    10     8     8     6     5
+#&gt; 6 B         3     6     6     7    10     3
+```
+
+---
+
+class: center, middle, inverse
+
+
+# Exercise time!
+
+.section-subtitle[
+
+Open the file
+
+.inverse[`M02-03-tidyr-reshape-pivot.R`]
+
+and attempt to do the exercises.
+
+We will discuss them shortly
+
+
+]
+
+
+---
+
+# Other tidyverse packages
+
+There are other useful packages that we did not have time to cover
+
+- `lubridate` - makes working with dates in R easy
+  - parsing dates .. turning date text into R dates
+  - extraction time and date components
+  - calculating time spans
+  
+- `stringr` -  working with character strings (text)
+ - extracting text within text
+ - pattern matching and replacing
+ 
+ - `forcats` - working with factors
+  - easy ordering levels of a factor
+  - easy recording of factor levels
+  
++ advanced other advanced packages (see https://www.tidyverse.org/packages/)
+
+--
+
+We will use `ggplot2` in the next module about plotting data
+
+---
+
+class: middle, center
+
+# End of module 1
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "ratio": "16:9",
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
