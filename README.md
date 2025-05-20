@@ -18,7 +18,7 @@ Ensure you have R, RStudio and git installed
 
 In RStudio, go
 
-1.  File \> New Project …
+1.  File \> New Project ….
 
 <img src="readme-images/file-new-project.png" width="400px" style="display: block; margin: auto;" />
 

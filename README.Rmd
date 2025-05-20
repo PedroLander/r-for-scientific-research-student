@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
 ```
 
 
-# R for Scientific Research - Madrid 2025
+# R for Data Analysis in Scientific Research - Madrid 2025 
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -28,7 +28,7 @@ Ensure you have R, RStudio and git installed
 
 In RStudio, go
 
-1. File > New Project ... 
+1. File > New Project .... 
 
 ```{r, echo = F, out.width='400px'}
 knitr::include_graphics("readme-images/file-new-project.png")
