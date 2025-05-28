@@ -1,0 +1,219 @@
+---
+title: "Two sample t-test"
+output: html_document
+date: "2025-05-28"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = F)
+```
+
+Let's compare the means of two samples using independent t-test (and paired t-test as
+extra exercises)
+
+ - Replace _ to complete expressions and return the correct answer  
+ - Restart R to remove previous results using: Ctrl/Cmd + shift + F10
+ - Remember - try to use Google to help you answer questions
+
+## Import the packages
+
+Import the `tidyverse` for `dplyr` and `ggplot2` packages
+
+```{r}
+_
+```
+
+
+## Two-sample t-test
+
+`River_pH.csv` contains pH measurements between two rivers. A researcher is interested 
+if the mean pH is different between the two rivers.
+
+### Import data
+
+Import `river_ph.csv` from the `data/` folder
+
+```{r}
+river_ph <-
+  _
+```
+
+### Examine the dataset
+
+- How many columns are there?
+- How many values of River_name are there?
+- How many samples in each group?
+
+```{r}
+
+```
+
+
+
+### Visualise data
+
+Visualise the data using a boxplot. Does there appear to be a difference in pH?
+
+```{r}
+river_ph %>% 
+  _
+```
+
+Update the axes labels, add a title, and export the plot as a png with dimensions 100 x 100 mm to the outputs folder.
+
+```{r}
+river_ph %>% 
+  _
+
+ggsave(_)
+```
+
+### Summarise 
+
+Obtain a data summary including
+ - the number of samples
+ - mean
+ - standard deviation (sd)
+ - standard error ( sd / sqrt(n) )
+ 
+```{r}
+river_ph_data_summary <-
+  river_ph %>% 
+  group_by(_) %>% 
+  summarise(
+    n_samples = n(),
+    mean_pH = _(_),
+    sd_pH = _(_),
+    se_pH = sd_pH / sqrt(n_samples)
+  )
+
+river_ph_data_summary
+```
+
+### Conduct t-test
+
+What is the null hypothesis here?
+
+```text
+
+```
+
+Conduct a t.test of pH between rivers.
+
+ - Assume equal variances for traditional t-test (var.equal = T)
+ - Remember to use a formula y ~ x
+
+```{r}
+t.test(_, data = _, var.equal = T)
+```
+
+```text
+
+```
+
+```{r, include=F}
+# If you have successfully completed the code above, try to "knit" the document"
+# Use the "knit" button at the top of the script panel
+```
+
+## Additional exercises - Paired t-test
+
+`madrid-weather-monthly-2010-2020.csv` contains daily temperature, humidity and precipitation every two years from 2010 to 2020.
+
+A researcher wants to know if there is a difference in monthly temperature, on
+average, between the year 2010 and the year 2020. We will pair the months from
+each year and conduct a paired t-test.
+
+```{r, eval=FALSE}
+### Import data
+
+madrid_weather <-
+  readr::read_csv(_)
+
+### Prepare data
+
+# - Filter the data for the years 2010 and 2020
+# - Summarise the daily data by year and month to obtain mean monthly Temperature_C
+
+madrid_weather_monthly_2010_2020 <-
+  madrid_weather %>% 
+  filter(year %in% c(_)) %>% 
+  group_by(_, _) %>% 
+  summarise(
+    Temperature_C = mean(_),
+    .groups = 'drop'
+  )
+
+
+# Next you need to pivot the data so there are 2 columns of monthly data from 2010 and 2020
+
+
+madrid_weather_monthly_2010_2020_wide <-
+  madrid_weather_monthly_2010_2020 %>% 
+  pivot_wider(names_from = _,
+              values_from = _,
+              names_prefix = 'year_')
+
+
+### Plot the data
+
+# There a different ways to do this. To save time, I've provided a two
+
+#### Using a line graph
+
+# - Plot monthly temperature as two coloured lines from each year
+# - There should only be 2 values in the legend
+
+
+madrid_weather_monthly_2010_2020 %>% 
+  ggplot(aes(x = _, y = _, color = _)) +
+  _
+
+#### Boxplot of differences
+
+# - Calculate the difference between 2020 and 2010
+# - Then use a boxplot to plot the calculated difference
+
+madrid_weather_monthly_2010_2020_wide %>% 
+  mutate(temp_difference = _ - _) %>% 
+  ggplot(aes(x = _)) +
+  _ +
+  scale_y_continuous(limits = c(-1,1),
+                     breaks = NULL) +
+  geom_vline(xintercept = 0, linetype = 'dashed') +
+  labs(title = 'Monthly temperature difference between 2020 and 2010',
+       x = 'Temperature')
+
+# Export the plot if you wish
+
+
+### Conduct a paired t-test
+
+# What is the null hypothesis here?
+_
+
+# - Remember to provide the arguments x and y the columns of the data, and to
+# - use the argument paired = TRUE
+ 
+
+t.test(
+  x = _,
+  y = _,
+  paired = _
+)
+
+# Write a short summary sentence
+
+
+```
+
+
+
+## Conclusion 
+
+We examined
+
+ - independent t-test
+ - paired t-test
+ - reviewed some data manipulation
+ - reviewed some data visualisation

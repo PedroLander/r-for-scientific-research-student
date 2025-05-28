@@ -1,0 +1,293 @@
+---
+title: "Linear regression"
+output: html_document
+date: "2025-05-28"
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = F)
+```
+
+We had a look a simple linear regression. Now lets flex our linear model muscles.
+
+ - Replace _ to complete expressions and return the correct answer
+ - Restart R to remove previous results using: Ctrl/Cmd + shift + F10
+ - Remember - try to use google to help you answer questions
+
+
+## Import packages
+
+Import the `tidyverse` for `dplyr` and `ggplot2` packages
+
+```{r}
+_
+```
+
+### Simple linear regression
+
+A researcher wants to know if flipper length is a good proxy for body mass for 
+Adelie penguins. They want to build a model that will allow them to predict body
+mass by only measuring flipper length.
+
+### Import the data
+
+`penguins.csv` contains morphometric data on 3 species of penguins including
+Adelie penguins. Import the file from the `data/` folder
+
+```{r}
+penguins <-
+  _
+```
+
+
+### Data preparation
+
+Filter the data to only include the species Adelie
+
+```{r}
+penguins_adelie <-
+  penguins %>% 
+  _
+```
+
+### Visualise the data
+
+Create a scatter plot of flipper_length_mm and y = body_mass_g, include a geom_smooth
+layer with method = 'lm'
+
+```{r}
+penguins_adelie %>% 
+  ggplot(aes(x = _, y = _)) +
+  _ +
+  _
+```
+
+In this particular case, with a simple linear regression, `geom_smooth(method = 'lm')`
+adds to the plot the results of a simple linear regression. In more complex cases, 
+we may need to obtain data from the model and add that as a layer to ggplot. Furthermore,
+we do not have the model object to inspect.
+
+Finalise the plot and export it to outputs as a 120 x 120 mm png
+
+```{r}
+ggsave(_)
+```
+
+
+### Fit a linear regression model
+
+Use lm() to fit a simple linear regression model.
+
+```{r}
+penguins_adelie_lm <-
+  lm(_,_ data = _)
+```
+
+`penguins_adelie_lm` is a linear model object, and simply a **list** (a data structure
+in R that has different elements of data, accessed with `$`, like a column in a 
+data.frame) with data elements from the model fit. We generally never have to access the list elements manually as we use accessor functions for that. But for example, I have 
+print the structure of the object to show there are names to select various parts
+of the model if needed
+
+```{r}
+str(penguins_adelie_lm)
+```
+
+#### Examine the fitted model
+
+Examine the residuals of the model using a residual vs fits plot (which = 1). Are
+they evenly spread around a residual of 0 in a blob type pattern?
+
+```{r}
+plot(_, which = 1, pch = 19)
+```
+
+There are other diagnostic plots for lm .. we are only looking at 1.
+
+```{r, eval = F}
+?plot.lm
+```
+
+We can also examine how far each point is from the line of best fit.We should see
+a normal, bell shaped curve if the model fits the data well. 
+
+This is one example of us accessing a data element from the `lm()` object. Make
+a histogram using `hist()` of the `residuals` element of `penguins_adelie_lm`
+
+```{r}
+hist(penguins_adelie_lm$_, breaks = 50)
+```
+
+
+### Obtain a summary of the model ----
+
+Use `summary()` to obtain the model summary
+
+  - Is flipper length a good predictor of body mass?
+  - Each unit increase in flipper_length_mm is associated with what change in body_mass_g 
+
+```{r}
+
+```
+
+Write a short conclusion paragraph
+
+```text
+
+```
+
+### Obtaining model predictions
+
+We can use `predict()` to obtain model predictions. We have to provide a data.frame
+with values to predict, and the column name must match that of the predictor used
+in `lm()`. The data.frame is passed to the `newdata=` argument
+
+Obtain the predicted mass for a flipper_length_mm of 200
+
+```{r}
+predict(penguins_adelie_lm, 
+        newdata = data.frame(flipper_length_mm = _))
+```
+
+Depending on the task we can obtain confidence or prediction intervals around the 
+estimates. Confidence intervals are used to estimate parameters, while prediction 
+intervals are used to make predictions about future values.
+
+To obtain confidence intervals, we need to include the interval argument
+Include 'confidence' in the interval argument below
+
+```{r}
+predict(penguins_adelie_lm, 
+        newdata = data.frame(flipper_length_mm = 200), 
+        interval = _)
+```
+
+We can obtain many predictions at once. We need to make a data.frame of values to
+use with `predict()`. Create a sequence from 170 to 210 by 10 using `seq()` within
+the following code that will create a dta.frame with the column `flipper_length_mm`
+
+```{r}
+flipper_values_predict <-
+  data.frame(
+    flipper_length_mm = _
+  )
+
+flipper_values_predict
+```
+
+Then pass it to predict, which produced a data.frame with 3 columns - `fit`, `lwr`, `upr`
+
+```{r}
+flipper_body_mass_predictions <-
+  predict(penguins_adelie_lm, 
+          newdata = _, 
+          interval = "confidence")
+
+flipper_body_mass_predictions
+```
+
+Join back the `flipper_length_mm` values
+
+```{r}
+flipper_body_mass_predictions <-
+  flipper_body_mass_predictions |> 
+  bind_cols(
+    flipper_values_predict
+  )
+
+flipper_body_mass_predictions
+```
+
+You could use the predictions data.frame to add the model data layer to a ggplot()
+instead of using geom_smooth(). This is more useful with complex models.
+
+```{r}
+penguins_adelie %>% 
+  ggplot(aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point() +
+  geom_line(data = flipper_body_mass_predictions, mapping = aes(y = fit), linewidth = 1) +
+  geom_line(data = flipper_body_mass_predictions, mapping = aes(y = lwr)) +
+  geom_line(data = flipper_body_mass_predictions, mapping = aes(y = upr))
+```
+
+
+```{r, include=F}
+# If you have successfully completed the code above, try to "knit" the document"
+# Use the "knit" button at the top of the script panel
+```
+
+
+## Extra exercises - Multiple linear regression
+
+The cell_growth.csv contains the cell diameter and concentration of Tetrahymena 
+cells with and without glucose added to growth medium. Glucose = 1 means glucose
+was added, Glucose = 2 means glucose was absent
+
+A researcher wants to know how cell concentration and glucose addition affect
+the cell diameter of Tetrahymena
+
+```{r}
+# 2.1 Import data ----
+# Import cell_growth.csv
+cell_growth <-
+  readr::read_csv(_)
+
+cell_growth
+
+# 2.2 Visualise data ----
+# Make a scatter plot of cell diameter and concentration, coloured by glucose
+# The glucose legend should only be 2 values
+# Is trend linear?
+cell_growth %>% 
+  ggplot(aes(x = _ , y = _, color = _)) +
+  geom_point()
+
+# We need to create a factor out of glucose
+cell_growth <-
+  cell_growth %>% 
+  mutate(glucose = factor(_, labels = c('Yes', 'No')))
+
+# Try log transforming cell_conc before making the plot
+# If the trend look linear, then that is how we should include the predictor in the
+# linear model
+cell_growth %>% 
+  ggplot(aes(x = _(cell_conc) , y = cell_diameter, color = glucose)) +
+  geom_point() 
+
+
+# 2.3 Fit a linear model ----
+# We are using the * between predictor for a "crossed" design. It means the
+# regression slope for each glucose treatment can be different (we could also 
+# constrain them to be the same)
+cell_growth_lm <-
+  lm(_ ~ log10(_) * _, data = cell_growth) 
+
+
+# 2.4 Examine the fitted model ----
+# Are the residuals evenly spread without nay pattern?
+# Possible outliers have numbers, but we will not deal with them further
+plot(_, which = 1, pch = 19)
+
+# 2.5 Obtain the summary of the fitted model ----
+# Use summary() on the linear model object
+#
+# This is be a fit difficult to read if you have not seen it before. It is like
+# like this is for a statistical estimation reason that we will not discuss further 
+
+# (Intercept)                        = the intercept for glucose = 1
+# log10(cell_conc)                   = the slope for glucose = 1             
+# factor(glucose)2                   = difference in intercept for glucose 2 to glucose 1   
+# log10(cell_conc):factor(glucose)2  = difference in slope for glucose 2 to glucose 1
+
+# Is the slope between cell_diameter and log10(cell_conc) difference between glucose
+# levels?
+_
+
+# 2.6 Analysis of variance ----
+# We can conduct an ANOVA on this model to test the hypotheses
+# 1. Is the a relationship between cell_diameter and cell concentration regardless of glucose addition?
+# 2. Does glucose addition affect cell diamenter regardless of cell concentration?
+# 3. Does glucose affect the relationship between cell diameter and cell concentration?
+# Use anova() on the linear model object 
+_
+```
