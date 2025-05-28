@@ -141,3 +141,7 @@ h1 > code {
     overflow-y: auto !important;
 }
 
+.scrollable-slide-full {
+    height: 100%;
+    overflow-y: auto !important;
+}
