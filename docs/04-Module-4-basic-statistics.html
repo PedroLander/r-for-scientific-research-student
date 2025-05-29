@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Module 4 - Basic statistical tests and models</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="" />
+    <script src="libs/header-attrs-2.29/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+class: middle, inverse, title
+
+
+
+# Module 4 - Basic statistical tests and models 
+
+.section-subtitle[
+
+- Statistics and R
+- t-tests
+- ANOVA
+- Linear regression
+- Moving forward
+
+]
+
+---
+
+
+
+
+
+
+
+# Background
+
+In science, we conduct **hypothesis testing** and/or create **statistical models**. These are all part of the same framework but may serve different purposes
+
+--
+
+.pull-left[
+
+**Hypothesis testing**
+
+Test a specific claim about a hypothesis. Often examine the **effect of treatments** on some **outcome**
+
+1. Create hypothesis
+  
+  - Null hypothesis `\(H_0\)` of no difference (what we test against)
+  - Alternate hypothesis `\(H_a\)` a difference is present
+
+2. Conduct experiment - collect and analyse data
+  
+3. Calculate a test statistic 
+
+  - a number calculated to compare with a distribution expected under `\(H_0\)`
+  
+4. Accept or reject `\(H_0\)` and interpret results
+
+]
+
+--
+
+.pull-right[
+
+**Statistical models**
+
+Aim to understand relationships between variables and to **make predictions**.
+
+1. Specify a model type based on response variable
+ - linear regression, logistic regression, etc ..
+
+2. Collect and prepare data
+
+3. Fit model and estimate parameters
+ - predictor selection
+
+4. Assess model fit
+
+5. Interpret model / validate model / use for predictions
+
+]
+
+--
+
+.footnote[
+**Underlying statistical procedures similar for both!**
+]
+
+---
+
+# Statistics in R
+
+**R is primarily a statistical computing software** ... it has a broad range of statistical procedures available
+
+ - There are routines for hypothesis testing, statistical modeling and machine learning
+
+--
+
+**Base R packages** can do the most common statistics
+- t-tests
+- Linear regression
+- Analysis of variance
+- Linear, non-linear and generalized linear models
+- Generalised additive models
+- Survival models
+- Classification and regression trees
+
+--
+
+**External packages** provide other types, or extend or improve functionality of these
+
+ - car (Companion to Applied Regression)
+ - lme4 (Linear Mixed-Effects Models using 'Eigen' and S4)
+ - glmnet (Lasso and Elastic-Net Regularized Generalized Linear Models)
+ - randomForest (RandomForestsforClassificationand Regression)
+ - tidymodels (Statistical learning tools)
+ - ... many more
+
+---
+
+# Conducting an analysis
+
+.pull-left[
+.text-095[
+
+Import and explore the data
+
+  - examine data distributions
+  - examine relationships between variables
+  - identify outliers or anomalies 
+  
+Create a statistical model
+ 
+ - hypothesis testing
+ - statistical modeling
+ 
+Assess the model
+
+ - does it fit the data?
+ - can we make conclusions from it?
+
+Interpret results
+
+ - is there a significant difference?
+ - is there a strong relationship between variables?
+
+Communicate results
+
+ - interpret trends given statistical results
+ - create plots
+]
+]
+
+.pull-right[
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="images/analysis-pipeline.png" alt="Adapted from R4DS" width="80%" /&gt;
+&lt;p class="caption"&gt;Adapted from R4DS&lt;/p&gt;
+&lt;/div&gt;
+]
+
+---
+
+# Some introductory statistics in R
+
+We will look at some basic **hypothesis testing** and **statistical modeling** in R
+
+.pull-left[
+**Hypothesis testing**
+ - t-tests
+ - Analysis of variance (ANOVA)
+ ]
+ 
+ .pull-right[
+**Statistical modeling**
+ - linear regression
+ ]
+ 
+**Note: Cannot properly teach statistics in 3 hours!**
+ 
+ &lt;/br&gt;
+
+--
+
+Many other statistical functions follow similar usage/code patterns
+
+ - experience with here should give you a good foundation for using other statistical procedures in R
+
+
+
+``` r
+model_object &lt;- 
+  model_function(response ~ factor1 * factor2 * ..., data = data, model_argument = ...)
+
+summary(model_object)
+plot(model_object, ...)
+predict(model_object, ...)
+model_specific_function(model_object, ...)
+```
+
+---
+
+# and introduce R Markdown documents
+
+[R Markdown](https://rmarkdown.rstudio.com/) is a tool that allows you to weave together narrative text and R code to 
+within an R script to produce **dynamic, reproducible reports and documents** in various formats (HTML, PDF, Word).
+
+It introduces a new type of script file `.Rmd`, and within RStudio the document looks different to a regular R script.
+
+````
+---
+title: "My first R Markdown"
+output: html_document
+date: "2025-05-26"
+---
+
+## A title
+
+Some text that appears are normal text in the output document. The following
+is a plot
+
+```{r}
+# R code goes here
+plot(x = 1:5, y = 1:5)
+```
+
+Here is a ANOVA
+
+```{r}
+summary(aov(body_mass ~ species, data = penguins))
+```
+
+
+````
+
+---
+
+.scrollable-slide-full[
+# My first R Markdown
+#### date: "2025-05-26"
+
+## A title
+
+Some text that appears are normal text in the output document. The following
+is a plot
+
+
+``` r
+# R code goes here
+plot(body_mass ~ species, data = penguins)
+```
+
+![](04-Module-4-basic-statistics_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+Here is a ANOVA
+
+
+``` r
+summary(aov(body_mass ~ species, data = penguins))
+```
+
+```
+#&gt;              Df    Sum Sq  Mean Sq F value Pr(&gt;F)    
+#&gt; species       2 146864214 73432107   343.6 &lt;2e-16 ***
+#&gt; Residuals   339  72443483   213698                   
+#&gt; ---
+#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#&gt; 2 observations deleted due to missingness
+```
+]
+
+---
+
+# R Markdown
+
+Many R tutorial and resources are written in R Markdown (or similar) ...
+
+Some references
+
+ - https://rmarkdown.rstudio.com/authoring_basics.html
+ - https://bookdown.org/yihui/rmarkdown/
+ - https://bookdown.org/
+ 
+--
+
+For a new Rmarkdown in RStudio (with a small template to remind you how it works)
+
+ - File &gt; New File &gt; R Markdown &gt; Document
+ 
+This should get you started!
+
+--
+
+The following exercises with be in R Markdown format.
+
+The assignment can be completed using R Markdown too!
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+class: middle
+
+# t-tests
+
+---
+
+# Two sample t-test
+
+&lt;style type="text/css"&gt;
+.t-statistic {
+  position: absolute;
+  top: 30%;
+  right: 2%;
+  width: 300px;
+}
+&lt;/style&gt;
+
+Compares whether the **means** of **two independent sets of samples** come from the same population.
+
+**Example:** Is there soil temperature different between north and south facing hill slopes 
+
+--
+
+**How it works**
+
+1. State the **null hypothesis**: `\(H_0 : mean_1 == mean_2\)`
+
+--
+
+2.  Create a **t test statistic**
+  - compare the difference in means to the variation within groups
+  
+  -  `\(t = \frac{\bar{x_1} - \bar{x_2}}{SE_{pooled}}\)`
+  
+  - size depends on how different means are, and how much variation in the groups 
+--
+&lt;div class="t-statistic"&gt;&lt;img src="images/t-statistic.png" style="display: block; margin: auto;"&gt;&lt;/div&gt;  
+--
+
+3. Compare the test statistic to a **t-distribution**
+
+  - Think: distribution of test statistics calculated *many, many times*, assuming the null hypothesis is actually true each time (`\(H_0\)` was true)
+  
+  - Determine how likely your test statistic is observed - **the P value**
+  
+  - Conclude if means come from same population - **keep or reject null hypothesis**
+
+
+---
+
+# Two sample t-test in R
+
+.pull-left-40[
+
+**What we need**
+
+A data.frame with 2 columns
+   - reponse values
+   - group identifiers
+
+
+
+
+``` r
+example_data
+```
+
+```
+#&gt;    group response
+#&gt; 1      A      5.1
+#&gt; 2      A      4.1
+#&gt; 3      A      6.4
+#&gt; 4      A      5.4
+#&gt; 5      A      4.7
+#&gt; 6      A      6.4
+#&gt; 7      A      6.9
+#&gt; 8      A      2.6
+#&gt; 9      B      6.4
+#&gt; 10     B      6.5
+#&gt; 11     B      6.8
+#&gt; 12     B      6.2
+#&gt; 13     B      5.6
+#&gt; 14     B      6.9
+#&gt; 15     B      7.7
+#&gt; 16     B      6.2
+```
+]
+
+--
+
+.pull-right-60[
+
+**What we do**
+
+Plot the data first!!
+
+Use the `t.test()` function with a **formula**
+
+ - `response ~ group` is the formula
+ - those columns live in `data = example_data`
+
+
+
+``` r
+t.test(
+  formula = response ~ group, # formula
+  data = example_data,        # the data.frame
+  var.equal = TRUE            # traditional t-test
+)
+```
+]
+ 
+---
+
+# t-test output
+
+.pull-left-20[
+
+**Plot**
+
+&lt;img src="04-Module-4-basic-statistics_files/figure-html/unnamed-chunk-22-1.png" width="100%" /&gt;
+]
+
+--
+
+.pull-right-80[
+
+**t-test result**
+
+
+``` r
+t.test(
+  formula = response ~ group, # formula
+  data = example_data,        # the data.frame
+  var.equal = TRUE            # traditional t-test
+)
+```
+
+```
+#&gt; 
+#&gt; 	Two Sample t-test
+#&gt; 
+#&gt; data:  response by group
+#&gt; t = -2.4479, df = 14, p-value = 0.02816
+#&gt; alternative hypothesis: true difference in means between group A and group B is not equal to 0
+#&gt; 95 percent confidence interval:
+#&gt;  -2.5094039 -0.1655961
+#&gt; sample estimates:
+#&gt; mean in group A mean in group B 
+#&gt;          5.2000          6.5375
+```
+]
+
+&lt;/br&gt;
+
+--
+
+**Conclusion**: The values were significantly higher in B than A (independent t-test: t = 2.4, df = 14, P = 0.028)
+
+---
+
+name: paired-t-test
+
+# Other t-test types
+
+These use the `t.test()` function with different input data and arguements.
+
+.pull-left[
+
+**One sample t-test**
+
+Is a sample significantly different from 0 (or another given value)
+
+**Example:** 
+
+
+``` r
+t.test(x = data$response, mu = 0)
+```
+
+]
+
+--
+
+.pull-right[
+
+**Paired t-test**
+
+Is there a difference between  two groups when the **same samples were measured by each group** . 
+
+**Example:** Measuring performance of 10 machines before and after upgrade
+
+
+``` r
+t.test(
+  x = example_data$group_A,
+  y = example_data$group_B,
+  paired = TRUE
+)
+```
+]
+
+
+.footnote[
+We will not examine this in class - [there are slides at end of presentation](#paired-t-test-section) - for you to view in your own time. I have also provided an exercise in `M04-01-t-test.R`. 
+]
+
+
+
+---
+
+class: center, middle, inverse
+
+# Exercise time!
+
+.section-subtitle[
+
+Open the file
+
+.inverse[`M04-01-t-test.R`]
+
+and attempt to do the exercises.
+
+We will discuss them shortly
+
+
+]
+
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+class: middle
+
+# Analysis of Variance (ANOVA)
+
+---
+
+# ANOVA
+
+ANOVA is used to compare the **means** across levels of **one or more categorical independent variables**. The logic is similar to a t-test, only with more groups. More complex designs can be used too - **factorial ANOVA**.
+
+**Example:** Is there a difference in body weight of mice between five different diets
+
+--
+
+**How it works**
+
+1. Based on the **linear model**: `\(y_{ij} = \mu + \alpha_i + \epsilon{ij}\)`
+  - `\(\mu\)` is the overall mean across all samples
+  - `\(\alpha_i\)` is the effect of each group
+  - `\(\epsilon\)` is the error term: random variability in `\(y\)` that the model does not capture
+
+--
+
+2. ANOVA **partitions variance between and within groups** to create an **F test statistic**
+ - `\(F = \frac{MS_{between}}{MS_{within}}\)` 
+ - size depends on how different means are vs how much variation in the groups
+
+--
+
+3. Compare the test statistic to a F distribution
+  - Null hypothesis `\(H_o: \mu_1 = \mu_2 = \mu_n\)`
+  - Determine how likely your test statistic is observed - **the P value**
+  - Conclude if means come from same population - **keep or reject null hypothesis**
+
+---
+
+# ANOVA in R
+
+There are 2 ways to do ANOVA in R. Below uses "traditional language of the analysis of variance"
+
+.pull-left-30[
+
+**What we need**
+
+A data.frame with 2 columns
+   - response values
+   - group identifiers
+
+
+
+
+``` r
+example_data
+```
+
+```
+#&gt;    group response
+#&gt; 1      A        5
+#&gt; 2      A        3
+#&gt; 3      A        3
+#&gt; 4      A        6
+#&gt; 5      B        9
+#&gt; 6      B        8
+#&gt; 7      B        7
+#&gt; 8      B       11
+#&gt; 9      C        8
+#&gt; 10     C       11
+#&gt; 11     C       13
+#&gt; 12     C       12
+```
+]
+
+--
+
+.pull-right-70[
+
+**What we do**
+
+Plot the data first!!
+
+Use the `aov()` with a **formula** 
+
+ - `response ~ group` is the formula
+ - those columns live in `data = example_data`
+
+
+
+``` r
+example_data_aov &lt;- aov(response ~ group, data = example_data)
+```
+
+Use `summary()` for the ANOVA table
+
+
+``` r
+summary(example_data_aov)
+```
+
+
+Use `TukeyHSD()` pairwise testing
+
+
+``` r
+TukeyHSD(example_data_aov)
+```
+]
+
+---
+
+# ANOVA output
+
+.pull-left-30[
+
+**Plot**
+
+&lt;img src="04-Module-4-basic-statistics_files/figure-html/unnamed-chunk-42-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right-70[
+
+**ANOVA**
+
+- Create the `aov()` object
+- Use `summary()` to obtain the ANOVA table
+
+
+``` r
+example_data_aov &lt;-
+  aov(response ~ group, data = example_data)
+
+summary(example_data_aov)
+```
+
+```
+#&gt;             Df Sum Sq Mean Sq F value  Pr(&gt;F)   
+#&gt; group        2   94.5   47.25   14.41 0.00156 **
+#&gt; Residuals    9   29.5    3.28                   
+#&gt; ---
+#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+]
+
+&lt;/br&gt;
+--
+
+**Conclusion**: A difference in means between groups was detected (ANOVA: F&lt;sub&gt;2,21&lt;/sub&gt; = 13.5, P = &lt;0.001)
+
+--
+
+Given **a difference was detected**, we logically next test which groups differed using **pairwise testing**
+
+---
+
+# ANOVA pairwise testing in R
+
+The "Tukey honest significant difference" pairwise comparison can be conducted on `aov()` object using `TukeyHSD()`
+
+.pull-left-30[
+
+**Plot**
+
+&lt;img src="04-Module-4-basic-statistics_files/figure-html/unnamed-chunk-44-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+
+.pull-right-70[
+
+**TukeyHSD**
+
+
+``` r
+TukeyHSD(example_data_aov)
+```
+
+```
+#&gt;   Tukey multiple comparisons of means
+#&gt;     95% family-wise confidence level
+#&gt; 
+#&gt; Fit: aov(formula = response ~ group, data = example_data)
+#&gt; 
+#&gt; $group
+#&gt;     diff        lwr     upr     p adj
+*#&gt; B-A 4.50  0.9256997  8.0743 0.0163027
+*#&gt; C-A 6.75  3.1756997 10.3243 0.0013303
+#&gt; C-B 2.25 -1.3243003  5.8243 0.2375316
+```
+]
+
+--
+
+
+**Conclusion**: A difference in means between groups was detected (ANOVA: F&lt;sub&gt;2,21&lt;/sub&gt; = 13.5, P = &lt;0.001). Groups B and C differed from A (tukeys HSD: p&lt;sub&gt;adj&lt;/sub&gt; &lt; 0.05) but not with each other (tukeys HSD: p&lt;sub&gt;adj&lt;/sub&gt; = 0.576)
+
+
+---
+
+# Complex ANOVA
+
+More complex designs can be accomplished with ANOVA
+
+- Two, or more factors, with interactions
+
+
+``` r
+aov(response ~ treatment1 * treatment2, data = example_data)
+```
+
+- Nested designs
+
+
+``` r
+aov(numberAnimals ~ SpeciesRemoval + Site %in% SpeciesRemoval, data = example_data)
+```
+
+--
+
+However the latter is better with **linear mixed models** 
+
+
+``` r
+library(lme4)
+fit1 &lt;- lmer(numberAnimals ~ SpeciesRemoval + (1|Site))
+anova(fit1)
+```
+
+--
+
+Pairwise comparisons with packages such as `multcomp`, `emmeans`
+
+
+
+.footnote[
+[lm4 book](https://stat.ethz.ch/~maechler/MEMo-pages/lMMwR.pdf)
+[multcomp](https://cran.r-project.org/web/packages/multcomp/index.html)
+[emmeans](https://cran.r-project.org/web/packages/emmeans/index.html)
+]
+
+---
+
+# The `lm()` method
+
+We could have done the same using `lm()` and `anova()` but pairwise testing becomes
+slightly complex (can be done with `multcomp` or `emmeans` packages, and which are
+quick useful in with more complex models)
+
+
+``` r
+example_data_lm &lt;- lm(response ~ group, data = example_data)
+anova(example_data_lm)
+```
+
+```
+#&gt; Analysis of Variance Table
+#&gt; 
+#&gt; Response: response
+#&gt;           Df Sum Sq Mean Sq F value   Pr(&gt;F)   
+#&gt; group      2   94.5  47.250  14.415 0.001562 **
+#&gt; Residuals  9   29.5   3.278                    
+#&gt; ---
+#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+---
+
+# The `lm()` method
+
+We could have done the same using `lm()` and `anova()` but pairwise testing becomes
+slightly complex (can be done with `multcomp` or `emmeans` packages, and which are
+quick useful in with more complex models)
+
+
+``` r
+library(multcomp)
+glht(example_data_lm, linfct = mcp(group = "Tukey")) |&gt; 
+  summary()
+```
+
+```
+#&gt; 
+#&gt; 	 Simultaneous Tests for General Linear Hypotheses
+#&gt; 
+#&gt; Multiple Comparisons of Means: Tukey Contrasts
+#&gt; 
+#&gt; 
+#&gt; Fit: lm(formula = response ~ group, data = example_data)
+#&gt; 
+#&gt; Linear Hypotheses:
+#&gt;            Estimate Std. Error t value Pr(&gt;|t|)    
+#&gt; B - A == 0     4.50       1.28   3.515   0.0161 *  
+#&gt; C - A == 0     6.75       1.28   5.273   &lt;0.001 ***
+#&gt; C - B == 0     2.25       1.28   1.758   0.2376    
+#&gt; ---
+#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#&gt; (Adjusted p values reported -- single-step method)
+```
+
+
+
+---
+
+class: center, middle, inverse
+
+# Exercise time!
+
+.section-subtitle[
+
+Open the file
+
+.inverse[`M04-02-ANOVA.R`]
+
+and attempt to do the exercises.
+
+We will discuss them shortly
+
+
+]
+
+
+---
+
+
+
+
+
+
+
+class: middle
+
+# Linear regression
+
+
+---
+
+# Linear regression
+
+Used to model the relationship between a **response variable** and **one, or more, explanatory variables**.
+
+**Example:** Is temperature and rainfall good predictors of plant height?
+
+--
+
+**How it works**
+
+1. A linear model: `\(y = \alpha + \beta_1x_1 + \beta_2x_2 + \beta_nx_x + \epsilon\)`
+  - `\(\alpha\)` is the intercept: value of `\(y\)` when `\(x = 0\)`)
+  - `\(\beta\)` are the slopes: amount change in `\(y\)` for each unit change in each `\(x\)`
+  - `\(\epsilon\)` is the error term: random variability in `\(y\)` that the model does not capture
+
+--
+
+2. Use **method of least squares** to estimate line of best fit
+
+--
+
+3. Obtain summary of the model
+  - coefficients and standard errors
+  - Statistical tests whether coefficients are 0 or different from each other
+
+--
+
+4. Conduct ANOVA on predictors
+ 
+--
+
+4. Obtain predictions from model (if required)
+
+
+
+---
+
+# Simple linear regression in R
+
+.pull-left-30[
+
+**What we need**
+
+A data.frame with 2 columns
+   - response values
+   - predictor values
+
+
+
+
+``` r
+example_data
+```
+
+```
+#&gt;    growth temperature
+#&gt; 1    29.0          21
+#&gt; 2    15.7          14
+#&gt; 3     9.6          14
+#&gt; 4    33.2          24
+#&gt; 5    45.3          28
+#&gt; 6    28.1          26
+#&gt; 7    24.8          23
+#&gt; 8    42.0          30
+#&gt; 9    18.5          18
+#&gt; 10   26.3          26
+#&gt; 11   38.8          28
+#&gt; 12   44.1          27
+#&gt; 13   29.3          29
+#&gt; 14   35.6          21
+#&gt; 15   13.1          10
+#&gt; 16   29.4          12
+#&gt; 17   22.8          16
+#&gt; 18   27.5          28
+#&gt; 19   23.1          16
+#&gt; 20    2.6          11
+```
+]
+
+--
+
+.pull-right-70[.text-075[
+
+**What we do**
+
+Plot the data first!!
+
+Use the `lm()` function with a **formula**
+
+ - `response ~ predictor` is the formula
+ - those columns live in `data = example_data`
+
+
+
+``` r
+example_data_lm &lt;- lm(growth ~ temperature, data = example_data)
+```
+
+Check model fit e.g. `plot()`
+
+
+``` r
+plot(example_data, which = 1)
+```
+
+Use `summary()` for the fit details
+
+
+``` r
+summary(example_data_lm)
+```
+
+Use `anova()` for hypothesis testing
+
+
+``` r
+anova(example_data_lm)
+```
+
+Use `predict()` for predictions from the model
+
+
+``` r
+predict(example_data_lm, newdata = data.frame(temperature = 33))
+```
+
+]
+]
+
+---
+
+# Visualise the data
+
+
+``` r
+example_data |&gt; 
+  ggplot(aes(x = temperature, y = growth)) +
+  geom_point()
+```
+
+&lt;img src="04-Module-4-basic-statistics_files/figure-html/unnamed-chunk-75-1.png" width="450px" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Simple linear regression in R
+
+
+Always assign the result to an object (we use it later)
+
+
+``` r
+example_data_lm &lt;- lm(formula = growth ~ temperature, data = example_data)
+```
+
+--
+
+The printed result is very brief
+
+ - it provides the `\(\alpha\)` and `\(\beta\)` coefficients
+
+
+``` r
+example_data_lm
+```
+
+```
+#&gt; 
+#&gt; Call:
+#&gt; lm(formula = growth ~ temperature, data = example_data)
+#&gt; 
+#&gt; Coefficients:
+#&gt; (Intercept)  temperature  
+#&gt;      -1.085        1.328
+```
+
+Each unit increase in temperature is associated with a 1.328 increase in growth
+
+---
+
+# Simple linear regression in R
+
+We have to use **accessor functions** to obtain other information about the model e.g. `summary()`
+
+
+``` r
+summary(fit1)
+```
+
+--
+
+.pull-left-66[
+
+```
+#&gt; 
+#&gt; Call:
+#&gt; lm(formula = growth ~ temperature, data = example_data)
+#&gt; 
+#&gt; Residuals:
+#&gt;     Min      1Q  Median      3Q     Max 
+#&gt; -10.925  -5.798   1.548   3.010  14.547 
+#&gt; 
+#&gt; Coefficients:
+#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    
+#&gt; (Intercept)  -1.0854     5.5054  -0.197    0.846    
+#&gt; temperature   1.3282     0.2493   5.328 4.59e-05 ***
+#&gt; ---
+#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#&gt; 
+#&gt; Residual standard error: 7.267 on 18 degrees of freedom
+#&gt; Multiple R-squared:  0.612,	Adjusted R-squared:  0.5904 
+#&gt; F-statistic: 28.39 on 1 and 18 DF,  p-value: 4.591e-05
+```
+]
+
+.pull-right-33[
+
+- Model estimates for `\(\alpha\)` and `\(\beta\)`
+ 
+- Statistical tests for `\(\alpha\)` and `\(\beta\)`
+
+- R&lt;sup&gt;2&lt;/sup&gt;
+
+- Other information
+
+]
+
+.footnote[
+
+]
+
+---
+
+# Model assumptions
+
+Graphical diagnostics help us determine
+
+ - random spread of points around the regrssion line: **the trend is linear**
+ - if there is even spread around the regression line: **constant variance**
+ 
+**Data transformation** may be required e.g. log(response) if we fail to see this
+
+--
+
+.pull-left[
+
+
+
+``` r
+# Residuals vs fits plot
+plot(example_data_lm, which = 1, pch = 19)
+```
+
+&lt;img src="04-Module-4-basic-statistics_files/figure-html/unnamed-chunk-80-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right[
+
+Patterns to look for
+
+&lt;img src="images/residual-patterns.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+]
+
+
+---
+
+# If all is good, other accessor functions
+
+Interpret the model
+
+
+``` r
+summary(example_data_lm) # shown earilier
+```
+--
+Obtain estimates and confidence intervals
+
+
+``` r
+cbind(
+  Est. = coef(example_data_lm),
+  confint(example_data_lm)
+)
+```
+
+```
+#&gt;                  Est.       2.5 %    97.5 %
+#&gt; (Intercept) -1.085408 -12.6518572 10.481041
+#&gt; temperature  1.328218   0.8044689  1.851968
+```
+
+--
+
+Predict values
+
+
+``` r
+predict(example_data_lm, newdata = data.frame(temperature = c(10,20, 30)), interval = 'prediction')
+```
+
+```
+#&gt;        fit       lwr      upr
+#&gt; 1 12.19678 -4.493505 28.88706
+#&gt; 2 25.47896  9.823316 41.13460
+#&gt; 3 38.76114 22.436449 55.08584
+```
+
+---
+
+# If all is good, other accessor functions
+
+Further statistical testing of predictors
+ - We can do an `anova()` on a linear model `lm()` ... this is the **other way to do ANOVA in R**
+ - `lm()` + `anova()`  is more useful method for complex regression models than `aov()`
+
+
+``` r
+anova(example_data_lm)
+```
+
+```
+#&gt; Analysis of Variance Table
+#&gt; 
+#&gt; Response: growth
+#&gt;             Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
+#&gt; temperature  1 1499.19 1499.19  28.387 4.591e-05 ***
+#&gt; Residuals   18  950.64   52.81                      
+#&gt; ---
+#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+--
+
+**Conclusion:** temperature is significant predictor of growth (F = 28.3, df = 1, P &lt; 0.001)
+
+
+---
+
+# Multiple linear regression
+
+Linear models can be easily extended for more complex situations
+
+  - Is temperature and rainfall good predictor of plant height?
+  
+
+``` r
+# Two continuous predictors
+lm(height ~ temperature + rainfall)
+```
+
+  - Is the relationship between flipper length an body mass the same between species?
+
+
+``` r
+# Continuous and categorical predictor
+lm(body_mass_g ~ flipper_length_mm * species)
+```
+
+ - Which blood markers best predict the redness of certain skin disease
+ 
+
+``` r
+# Many predictors, where a search algorthm can be used to find best predictors
+lm(redness ~ marker1 + marker2 + marker3 + marker4 + marker5)
+```
+
+---
+
+# Moving forward with linear models
+
+Linear modeling is a backbone of R .. if you do continue with them, here some tips
+
+ - Normal linear models are  created with `lm()`
+
+ - Generalised linear models are created with `glm()`
+ 
+ - Generalised additive models with `gam()` from `mgcv` package
+ 
+ - Mixed effect models with `lmer()` from `lme4` package
+ 
+ - Lasso and Elastic-Net Regularized Generalized Linear Models with `glmnet()` from the `glmnet` package
+ 
+ - Statistical/Machine learning model building with the `tidymodels` package
+ 
+ - Bayesian models with `rstan` + `rstanarm`
+ 
+--
+ 
+Some good books
+ 
+  - [An R Companion to Applied Regression - Fox and Weisberg](https://www.john-fox.ca/Companion/)
+ 
+  - [Modern Applied Statistics with S - the MASS package with base R](https://www.mimuw.edu.pl/~pokar/StatystykaMgr/Books/VenablesRipley_ModernAppliedStatisticsS02.pdf)
+
+- Google "Regression models in R books"
+ 
+---
+
+class: center, middle, inverse
+
+# Exercise time!
+
+.section-subtitle[
+
+Open the file
+
+.inverse[`M04-03-linear-regression.R`]
+
+and attempt to do the exercises.
+
+We will discuss them shortly
+
+
+]
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "ratio": "16:9",
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
